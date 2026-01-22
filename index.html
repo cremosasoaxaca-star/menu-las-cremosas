@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Las Cremosas 🍓 | Menú</title>
+  <meta name="description" content="Menú digital de Las Cremosas: fresas con crema, waffles, frappes, snacks y bebidas." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true">🍓</div>
+        <div class="brand__text">
+          <div class="brand__name">Las Cremosas</div>
+          <div class="brand__tagline">Menú digital</div>
+        </div>
+      </div>
+
+      <div class="header__actions">
+        <button id="btnShare" class="btn btn--ghost" type="button">Compartir</button>
+        <a id="btnWhats" class="btn btn--primary" href="#" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero__card">
+        <h1>Tu dosis de felicidad 🍓</h1>
+        <p>Menú actualizado desde una hoja en línea. Edita precios y productos en Google Sheets y la web se actualiza.</p>
+
+        <div class="controls">
+          <div class="search">
+            <input id="searchInput" type="search" placeholder="Buscar: fresas, waffle, nachos…" autocomplete="off" />
+          </div>
+
+          <div class="filters">
+            <select id="categorySelect" aria-label="Filtrar por categoría">
+              <option value="">Todas las categorías</option>
+            </select>
+            <label class="toggle">
+              <input id="toggleAvailable" type="checkbox" checked />
+              <span>Mostrar solo disponibles</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="menuTitle">
+      <div class="section__head">
+        <h2 id="menuTitle">Menú</h2>
+        <div class="meta">
+          <span id="lastUpdated" class="meta__pill">Actualizando…</span>
+          <span id="itemsCount" class="meta__pill">—</span>
+        </div>
+      </div>
+
+      <div id="menuGrid" class="grid" aria-live="polite"></div>
+      <div id="emptyState" class="empty hidden">
+        <div class="empty__emoji">😅</div>
+        <div class="empty__title">No encontré resultados</div>
+        <div class="empty__subtitle">Prueba con otra palabra o quita filtros.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>Extras</h2>
+        <p class="muted">Toppings, bases y chocolates (algunos con costo variable).</p>
+      </div>
+
+      <div class="extras">
+        <div class="extras__col">
+          <h3 class="extras__title">Toppings</h3>
+          <ul id="extrasToppings" class="list"></ul>
+        </div>
+        <div class="extras__col">
+          <h3 class="extras__title">Bases / Jarabes</h3>
+          <ul id="extrasBases" class="list"></ul>
+        </div>
+        <div class="extras__col">
+          <h3 class="extras__title">Chocolates</h3>
+          <ul id="extrasChocolates" class="list"></ul>
+          <div class="note">* Algunos chocolates son <strong>costo variable</strong>.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <h2>Envío</h2>
+        <p class="muted">Pregunta por disponibilidad y zonas de entrega.</p>
+      </div>
+      <div class="cta">
+        <div class="cta__text">
+          <div class="cta__title">¿Listo para pedir?</div>
+          <div class="cta__subtitle">Te respondemos por WhatsApp.</div>
+        </div>
+        <a id="ctaWhats" class="btn btn--primary" href="#" target="_blank" rel="noopener">Abrir WhatsApp</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <div class="footer__small">
+          <span>© <span id="yearNow"></span> Las Cremosas</span>
+          <span class="dot">•</span>
+          <a href="#" id="openHow" class="link">¿Cómo se actualiza?</a>
+        </div>
+        <div class="footer__small muted">
+          Hecho para verse bien en cualquier dispositivo.
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <dialog id="howDialog" class="dialog">
+    <div class="dialog__card">
+      <div class="dialog__head">
+        <div>
+          <div class="dialog__title">Actualizar desde Google Sheets</div>
+          <div class="dialog__subtitle">No necesitas programar para cambiar productos y precios.</div>
+        </div>
+        <button id="closeHow" class="btn btn--ghost" type="button">Cerrar</button>
+      </div>
+
+      <ol class="steps">
+        <li>Edita tu hoja <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> en Google Sheets.</li>
+        <li>En Sheets: <strong>Archivo → Compartir → Publicar en la web</strong>.</li>
+        <li>Publica cada hoja como <strong>CSV</strong> y copia los links.</li>
+        <li>Pega esos links en <code>js/config.js</code>.</li>
+        <li>Sube estos archivos a GitHub y activa <strong>GitHub Pages</strong>.</li>
+      </ol>
+
+      <div class="hint">
+        Tip: si quieres “ocultar” algo sin borrar, pon <strong>Disponible = No</strong>.
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
