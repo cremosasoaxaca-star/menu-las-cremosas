@@ -1,13 +1,11 @@
-/* Las Cremosas — app.js
-   Carga DATA_ITEMS y DATA_EXTRAS desde CSV (Google Sheets publicado).
-   Renderiza tarjetas, filtros y búsqueda. */
+/* Las Cremosas — app.js (Layout tipo póster con Seccion/Subseccion y orden) */
 
 const $ = (sel) => document.querySelector(sel);
 
 const state = {
   items: [],
   extras: [],
-  category: "",
+  section: "",
   q: "",
   onlyAvailable: true
 };
@@ -24,7 +22,7 @@ function formatPrice(value, currency="MXN"){
 }
 
 function parseCSV(csvText){
-  // Simple CSV parser that handles quoted fields
+  // CSV simple con soporte de comillas
   const rows = [];
   let cur = "";
   let inQuotes = false;
@@ -32,40 +30,28 @@ function parseCSV(csvText){
   for (let i=0; i<csvText.length; i++){
     const ch = csvText[i];
     const next = csvText[i+1];
-    if (ch === '"' ){
-      if (inQuotes && next === '"'){ // escaped quote
-        cur += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
+    if (ch === '"'){
+      if (inQuotes && next === '"'){ cur += '"'; i++; }
+      else inQuotes = !inQuotes;
     } else if (ch === ',' && !inQuotes){
-      row.push(cur);
-      cur = "";
+      row.push(cur); cur = "";
     } else if ((ch === '\n' || ch === '\r') && !inQuotes){
       if (ch === '\r' && next === '\n') i++;
-      row.push(cur);
-      rows.push(row);
-      row = [];
-      cur = "";
+      row.push(cur); rows.push(row);
+      row = []; cur = "";
     } else {
       cur += ch;
     }
   }
-  // flush
-  if (cur.length || row.length){
-    row.push(cur);
-    rows.push(row);
-  }
+  if (cur.length || row.length){ row.push(cur); rows.push(row); }
 
   if (!rows.length) return [];
   const header = rows[0].map(h => h.trim());
   const data = [];
   for (let r=1; r<rows.length; r++){
-    const obj = {};
     const cols = rows[r];
-    // skip fully empty rows
     if (!cols.some(c => String(c || "").trim() !== "")) continue;
+    const obj = {};
     for (let c=0; c<header.length; c++){
       obj[header[c]] = (cols[c] ?? "").trim();
     }
@@ -89,33 +75,35 @@ function normalizeBool(v, defaultVal=true){
   return defaultVal;
 }
 
-function buildCategories(items){
+function nOrInf(v){
+  const num = Number(String(v ?? "").replace(/[^\d.-]/g,""));
+  return Number.isFinite(num) ? num : Infinity;
+}
+
+function buildSections(items){
   const set = new Set();
   for (const it of items){
-    const cat = (it.Categoria || it.Category || "").trim();
-    if (cat) set.add(cat);
+    if (it.Seccion) set.add(it.Seccion);
   }
   return Array.from(set).sort((a,b)=> a.localeCompare(b, "es"));
 }
 
 function applyFilters(items){
   const q = state.q.trim().toLowerCase();
-  const cat = state.category;
+  const sec = state.section;
   const onlyAvail = state.onlyAvailable;
 
   return items.filter(it => {
     const available = normalizeBool(it.Disponible, true);
     if (onlyAvail && !available) return false;
 
-    if (cat){
-      const c = (it.Categoria || "").trim();
-      if (c !== cat) return false;
+    if (sec){
+      if ((it.Seccion || "") !== sec) return false;
     }
 
     if (q){
       const hay = [
-        it.Nombre, it.Descripcion, it.Categoria,
-        it.Tags, it.Badges, it.Notas
+        it.Seccion, it.Subseccion, it.Nombre, it.Descripcion
       ].map(x => String(x||"").toLowerCase()).join(" ");
       return hay.includes(q);
     }
@@ -123,84 +111,180 @@ function applyFilters(items){
   });
 }
 
-function renderCategoriesSelect(categories){
+function renderSectionsSelect(sections){
   const sel = $("#categorySelect");
-  // keep first option
-  const first = sel.querySelector("option");
   sel.innerHTML = "";
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = "Todas las secciones";
   sel.appendChild(first);
-  for (const c of categories){
+
+  for (const s of sections){
     const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
+    opt.value = s;
+    opt.textContent = s;
     sel.appendChild(opt);
   }
+}
+
+function groupBy(arr, keyFn){
+  const m = new Map();
+  for (const x of arr){
+    const k = keyFn(x) || "";
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(x);
+  }
+  return m;
+}
+
+function setMeta(filteredCount){
+  const now = new Date();
+  $("#lastUpdated").textContent = `Actualizado: ${now.toLocaleString("es-MX")}`;
+  $("#itemsCount").textContent = `${filteredCount} visibles`;
+}
+
+function buildWhatsAppLink(){
+  const phone = window.MENU_CONFIG?.whatsappPhoneE164 || "";
+  const name = window.MENU_CONFIG?.businessName || "Las Cremosas";
+  const msg = encodeURIComponent(`Hola ${name}! Quiero hacer un pedido 😊🍓`);
+  return `https://wa.me/${phone}?text=${msg}`;
+}
+
+function setupUI(){
+  $("#yearNow").textContent = new Date().getFullYear();
+
+  const whats = buildWhatsAppLink();
+  $("#btnWhats").href = whats;
+  $("#ctaWhats").href = whats;
+
+  $("#searchInput").addEventListener("input", (e)=>{
+    state.q = e.target.value || "";
+    rerender();
+  });
+
+  $("#categorySelect").addEventListener("change", (e)=>{
+    state.section = e.target.value || "";
+    rerender();
+  });
+
+  $("#toggleAvailable").addEventListener("change", (e)=>{
+    state.onlyAvailable = !!e.target.checked;
+    rerender();
+  });
+
+  $("#btnShare").addEventListener("click", async ()=>{
+    const shareData = {
+      title: document.title,
+      text: "Mira el menú de Las Cremosas 🍓",
+      url: location.href
+    };
+    try{
+      if (navigator.share) await navigator.share(shareData);
+      else {
+        await navigator.clipboard.writeText(location.href);
+        alert("Link copiado ✅");
+      }
+    }catch{}
+  });
+
+  const dlg = $("#howDialog");
+  $("#openHow").addEventListener("click", (e)=>{
+    e.preventDefault();
+    dlg.showModal();
+  });
+  $("#closeHow").addEventListener("click", ()=> dlg.close());
+  dlg.addEventListener("click", (e)=>{
+    const rect = dlg.querySelector(".dialog__card").getBoundingClientRect();
+    const inCard = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inCard) dlg.close();
+  });
 }
 
 function renderMenu(items){
   const grid = $("#menuGrid");
   const empty = $("#emptyState");
   grid.innerHTML = "";
+
   if (!items.length){
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
 
-  for (const it of items){
-    const name = it.Nombre || "Sin nombre";
-    const desc = it.Descripcion || "";
-    const price = it.Precio || it.PrecioMXN || "";
-    const currency = (window.MENU_CONFIG?.currency) || "MXN";
+  // Agrupar por Seccion (ordenado por OrdenSeccion)
+  const bySection = groupBy(items, it => it.Seccion || "Sin sección");
+  const sections = Array.from(bySection.entries())
+    .sort((a,b)=> nOrInf(a[1][0]?.OrdenSeccion) - nOrInf(b[1][0]?.OrdenSeccion) || a[0].localeCompare(b[0], "es"));
 
-    const badgesRaw = (it.Badges || it.Etiquetas || "").split("|").map(s=>s.trim()).filter(Boolean);
-    const note = (it.Notas || "").trim();
-    if (note) badgesRaw.push(note);
+  for (const [sectionName, sectionItems] of sections){
+    const sectionWrap = document.createElement("section");
+    sectionWrap.className = "poster-section";
 
-    const card = document.createElement("article");
-    card.className = "card";
+    const h = document.createElement("h3");
+    h.className = "poster-title";
+    h.textContent = sectionName;
+    sectionWrap.appendChild(h);
 
-    const top = document.createElement("div");
-    top.className = "card__top";
+    // Agrupar por Subseccion (como “Escoge tu tamaño…”, “¿Qué le vas…?”)
+    const bySub = groupBy(sectionItems, it => it.Subseccion || "General");
+    const subs = Array.from(bySub.entries())
+      .sort((a,b)=>{
+        // orden por el mínimo OrdenItem dentro de la subsección
+        const minA = Math.min(...a[1].map(x=>nOrInf(x.OrdenItem)));
+        const minB = Math.min(...b[1].map(x=>nOrInf(x.OrdenItem)));
+        return minA - minB || a[0].localeCompare(b[0],"es");
+      });
 
-    const left = document.createElement("div");
-    const title = document.createElement("div");
-    title.className = "card__name";
-    title.textContent = name;
-    left.appendChild(title);
+    for (const [subName, subItems] of subs){
+      const block = document.createElement("div");
+      block.className = "poster-block";
 
-    if (desc){
-      const p = document.createElement("div");
-      p.className = "card__desc";
-      p.textContent = desc;
-      left.appendChild(p);
-    }
+      const sh = document.createElement("div");
+      sh.className = "poster-subtitle";
+      sh.textContent = subName;
+      block.appendChild(sh);
 
-    const priceEl = document.createElement("div");
-    priceEl.className = "card__price";
-    priceEl.textContent = price ? formatPrice(price, currency) : "—";
+      // Ordenar items por OrdenItem
+      subItems.sort((a,b)=> nOrInf(a.OrdenItem) - nOrInf(b.OrdenItem));
 
-    top.appendChild(left);
-    top.appendChild(priceEl);
-    card.appendChild(top);
+      const list = document.createElement("div");
+      list.className = "poster-list";
 
-    if (badgesRaw.length){
-      const badges = document.createElement("div");
-      badges.className = "badges";
-      for (const b of badgesRaw.slice(0, 4)){
-        const span = document.createElement("span");
-        span.className = "badge";
-        const bLower = b.toLowerCase();
-        if (bLower.includes("más vendido") || bLower.includes("mas vendido") || bLower.includes("top")) span.classList.add("badge--fav");
-        if (bLower.includes("🔥") || bLower.includes("hot") || bLower.includes("picante")) span.classList.add("badge--hot");
-        if (b === note) span.classList.add("badge--note");
-        span.textContent = b;
-        badges.appendChild(span);
+      const currency = (window.MENU_CONFIG?.currency) || "MXN";
+
+      for (const it of subItems){
+        const row = document.createElement("div");
+        row.className = "poster-row";
+
+        const left = document.createElement("div");
+        left.className = "poster-left";
+
+        const name = document.createElement("div");
+        name.className = "poster-name";
+        name.textContent = it.Nombre || "—";
+
+        const desc = document.createElement("div");
+        desc.className = "poster-desc";
+        desc.textContent = it.Descripcion || "";
+
+        left.appendChild(name);
+        if ((it.Descripcion || "").trim()) left.appendChild(desc);
+
+        const price = document.createElement("div");
+        price.className = "poster-price";
+        price.textContent = (it.Precio || "").trim() ? formatPrice(it.Precio, currency) : "";
+
+        row.appendChild(left);
+        row.appendChild(price);
+
+        list.appendChild(row);
       }
-      card.appendChild(badges);
+
+      block.appendChild(list);
+      sectionWrap.appendChild(block);
     }
 
-    grid.appendChild(card);
+    grid.appendChild(sectionWrap);
   }
 }
 
@@ -243,76 +327,10 @@ function renderExtras(extras){
   }
 }
 
-function setMeta(){
-  const now = new Date();
-  $("#lastUpdated").textContent = `Actualizado: ${now.toLocaleString("es-MX")}`;
-  $("#itemsCount").textContent = `${state.items.length} productos`;
-}
-
-function buildWhatsAppLink(){
-  const phone = window.MENU_CONFIG?.whatsappPhoneE164 || "";
-  const name = window.MENU_CONFIG?.businessName || "Las Cremosas";
-  const msg = encodeURIComponent(`Hola ${name}! Quiero hacer un pedido 😊🍓`);
-  return `https://wa.me/${phone}?text=${msg}`;
-}
-
-function setupUI(){
-  $("#yearNow").textContent = new Date().getFullYear();
-
-  const whats = buildWhatsAppLink();
-  $("#btnWhats").href = whats;
-  $("#ctaWhats").href = whats;
-
-  $("#searchInput").addEventListener("input", (e)=>{
-    state.q = e.target.value || "";
-    rerender();
-  });
-
-  $("#categorySelect").addEventListener("change", (e)=>{
-    state.category = e.target.value || "";
-    rerender();
-  });
-
-  $("#toggleAvailable").addEventListener("change", (e)=>{
-    state.onlyAvailable = !!e.target.checked;
-    rerender();
-  });
-
-  $("#btnShare").addEventListener("click", async ()=>{
-    const shareData = {
-      title: document.title,
-      text: "Mira el menú de Las Cremosas 🍓",
-      url: location.href
-    };
-    try{
-      if (navigator.share){
-        await navigator.share(shareData);
-      }else{
-        await navigator.clipboard.writeText(location.href);
-        alert("Link copiado ✅");
-      }
-    }catch{ /* ignore */ }
-  });
-
-  const dlg = $("#howDialog");
-  $("#openHow").addEventListener("click", (e)=>{
-    e.preventDefault();
-    dlg.showModal();
-  });
-  $("#closeHow").addEventListener("click", ()=> dlg.close());
-  dlg.addEventListener("click", (e)=>{
-    const rect = dlg.querySelector(".dialog__card").getBoundingClientRect();
-    const inCard =
-      e.clientX >= rect.left && e.clientX <= rect.right &&
-      e.clientY >= rect.top && e.clientY <= rect.bottom;
-    if (!inCard) dlg.close();
-  });
-}
-
 function rerender(){
   const filtered = applyFilters(state.items);
   renderMenu(filtered);
-  $("#itemsCount").textContent = `${filtered.length} visibles`;
+  setMeta(filtered.length);
 }
 
 async function main(){
@@ -320,15 +338,8 @@ async function main(){
 
   const { itemsCsvUrl, extrasCsvUrl } = window.MENU_CONFIG?.sheets || {};
   if (!itemsCsvUrl || !extrasCsvUrl || itemsCsvUrl.includes("PASTE_") || extrasCsvUrl.includes("PASTE_")){
-    $("#lastUpdated").textContent = "Falta configurar los links CSV (js/config.js)";
+    $("#lastUpdated").textContent = "Falta configurar los links CSV (config.js)";
     $("#itemsCount").textContent = "—";
-    $("#menuGrid").innerHTML = `
-      <div class="empty">
-        <div class="empty__emoji">🧩</div>
-        <div class="empty__title">Configura tus CSV</div>
-        <div class="empty__subtitle">Abre <code>js/config.js</code> y pega los links de Google Sheets publicados como CSV.</div>
-      </div>
-    `;
     return;
   }
 
@@ -338,39 +349,33 @@ async function main(){
       fetchCSV(extrasCsvUrl)
     ]);
 
-    // Normalize fields if user used different headers
+    // Normalizar campos (por si alguna vez cambias nombres)
     state.items = items.map(it => ({
-      ...it,
-      Categoria: it.Categoria || it.Category || "",
+      Seccion: it.Seccion || it.Categoria || "Menú",
+      OrdenSeccion: it.OrdenSeccion || it.Orden || "",
+      Subseccion: it.Subseccion || it.Subcategoría || it.Subcategoria || it.Categoria || "General",
+      OrdenItem: it.OrdenItem || it.Orden || "",
       Nombre: it.Nombre || it.Producto || it.Item || "",
-      Descripcion: it.Descripcion || it.Descripción || "",
+      Descripcion: it.Descripcion || it.Descripción || it.Variante || it["Variante/Tamaño"] || "",
       Precio: it.Precio || it.PrecioMXN || it.Price || "",
-      Disponible: it.Disponible || it.Activo || "Si",
-      Badges: it.Badges || it.Etiquetas || ""
+      Disponible: it.Disponible || it.Activo || "Si"
     }));
 
     state.extras = extras.map(ex => ({
-      ...ex,
       Tipo: ex.Tipo || ex.Categoria || "",
       Nombre: ex.Nombre || ex.Item || ""
     }));
 
-    const categories = buildCategories(state.items);
-    renderCategoriesSelect(categories);
+    // Secciones para el selector
+    const sections = buildSections(state.items);
+    renderSectionsSelect(sections);
 
-    setMeta();
     rerender();
     renderExtras(state.extras);
   }catch(err){
     console.error(err);
     $("#lastUpdated").textContent = "Error cargando datos";
-    $("#menuGrid").innerHTML = `
-      <div class="empty">
-        <div class="empty__emoji">⚠️</div>
-        <div class="empty__title">No pude cargar el menú</div>
-        <div class="empty__subtitle">Revisa que los links CSV estén públicos y correctos (output=csv).</div>
-      </div>
-    `;
+    $("#itemsCount").textContent = "—";
   }
 }
 
