@@ -8,7 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- ✅ ruta correcta (archivo en raíz) -->
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <header class="header">
@@ -134,7 +136,7 @@
         <li>Edita tu hoja <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> en Google Sheets.</li>
         <li>En Sheets: <strong>Archivo → Compartir → Publicar en la web</strong>.</li>
         <li>Publica cada hoja como <strong>CSV</strong> y copia los links.</li>
-        <li>Pega esos links en <code>js/config.js</code>.</li>
+        <li>Pega esos links en <code>config.js</code>.</li>
         <li>Sube estos archivos a GitHub y activa <strong>GitHub Pages</strong>.</li>
       </ol>
 
@@ -144,7 +146,8 @@
     </div>
   </dialog>
 
- <script src="js/config.js"></script>
-<script src="js/app.js"></script>
+  <!-- ✅ rutas correctas (archivos en raíz) -->
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
