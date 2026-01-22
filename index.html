@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Las Cremosas 🍓 | Menú</title>
   <meta name="description" content="Menú digital de Las Cremosas: fresas con crema, waffles, frappes, snacks y bebidas." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <!-- ✅ ruta correcta (archivo en raíz) -->
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- ✅ GitHub Pages (repo: /menu-las-cremosas/) + cache-buster -->
+  <link rel="stylesheet" href="/menu-las-cremosas/styles.css?v=21" />
 </head>
+
 <body>
   <header class="header">
     <div class="header__inner">
@@ -42,8 +47,8 @@
           </div>
 
           <div class="filters">
-            <select id="categorySelect" aria-label="Filtrar por categoría">
-              <option value="">Todas las categorías</option>
+            <select id="categorySelect" aria-label="Filtrar por sección">
+              <option value="">Todas las secciones</option>
             </select>
             <label class="toggle">
               <input id="toggleAvailable" type="checkbox" checked />
@@ -64,6 +69,7 @@
       </div>
 
       <div id="menuGrid" class="grid" aria-live="polite"></div>
+
       <div id="emptyState" class="empty hidden">
         <div class="empty__emoji">😅</div>
         <div class="empty__title">No encontré resultados</div>
@@ -115,9 +121,7 @@
           <span class="dot">•</span>
           <a href="#" id="openHow" class="link">¿Cómo se actualiza?</a>
         </div>
-        <div class="footer__small muted">
-          Hecho para verse bien en cualquier dispositivo.
-        </div>
+        <div class="footer__small muted">Hecho para verse bien en cualquier dispositivo.</div>
       </div>
     </footer>
   </main>
@@ -146,8 +150,8 @@
     </div>
   </dialog>
 
-  <!-- ✅ rutas correctas (archivos en raíz) -->
-  <script src="./config.js"></script>
-  <script src="./app.js"></script>
+  <!-- ✅ GitHub Pages (repo: /menu-las-cremosas/) + cache-buster -->
+  <script src="/menu-las-cremosas/config.js?v=21"></script>
+  <script src="/menu-las-cremosas/app.js?v=21"></script>
 </body>
 </html>
