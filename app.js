@@ -1,67 +1,53 @@
-/* Las Cremosas — app.js (Modo PÓSTER por Seccion/Subseccion/Orden) */
-
-const $ = (s) => document.querySelector(s);
+const $ = (sel) => document.querySelector(sel);
 
 const state = {
-  rows: [],
+  items: [],
   extras: [],
+  sales: [],
+  expenses: [],
+  category: "",
   q: "",
-  sectionFilter: "",
-  onlyAvailable: true,
+  onlyAvailable: true
 };
 
-function norm(str) {
-  return String(str ?? "").trim();
-}
-
-function normLower(str) {
-  return norm(str).toLowerCase();
-}
-
-function toNum(v, fallback = 999999) {
-  const n = Number(String(v ?? "").replace(/[^\d.-]/g, ""));
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function isYes(v, def = true) {
-  const s = normLower(v);
-  if (!s) return def;
-  if (["si", "sí", "true", "1", "yes", "y"].includes(s)) return true;
-  if (["no", "false", "0", "n"].includes(s)) return false;
-  return def;
-}
-
-function formatPrice(v) {
-  const currency = window.MENU_CONFIG?.currency || "MXN";
-  const raw = norm(v);
-  if (!raw) return "";
-  const num = Number(raw.replace(/[^0-9.]/g, ""));
-  if (!Number.isFinite(num)) return raw;
+function formatPrice(value, currency = "MXN") {
+  if (value === null || value === undefined || value === "") return "";
+  const num = Number(String(value).replace(/[^0-9.-]/g, ""));
+  if (Number.isNaN(num)) return String(value);
   try {
     return new Intl.NumberFormat("es-MX", { style: "currency", currency }).format(num);
   } catch {
-    return `$${num}`;
+    return `$${num.toFixed(2)}`;
   }
 }
 
-function parseCSV(text) {
-  // CSV básico con comillas
-  const rows = [];
-  let row = [];
-  let cur = "";
-  let inQ = false;
+function toNumber(value) {
+  const num = Number(String(value ?? "").replace(/[^0-9.-]/g, ""));
+  return Number.isNaN(num) ? 0 : num;
+}
 
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    const nx = text[i + 1];
+function parseCSV(csvText) {
+  const rows = [];
+  let cur = "";
+  let inQuotes = false;
+  let row = [];
+
+  for (let i = 0; i < csvText.length; i++) {
+    const ch = csvText[i];
+    const next = csvText[i + 1];
 
     if (ch === '"') {
-      if (inQ && nx === '"') { cur += '"'; i++; }
-      else inQ = !inQ;
-    } else if (ch === "," && !inQ) {
-      row.push(cur); cur = "";
-    } else if ((ch === "\n" || ch === "\r") && !inQ) {
-      if (ch === "\r" && nx === "\n") i++;
+      if (inQuotes && next === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      row.push(cur);
+      cur = "";
+    } else if ((ch === "\n" || ch === "\r") && !inQuotes) {
+      if (ch === "\r" && next === "\n") i++;
       row.push(cur);
       rows.push(row);
       row = [];
@@ -70,176 +56,176 @@ function parseCSV(text) {
       cur += ch;
     }
   }
+
   if (cur.length || row.length) {
     row.push(cur);
     rows.push(row);
   }
 
   if (!rows.length) return [];
-  const header = rows[0].map(h => norm(h));
-  const out = [];
+
+  const header = rows[0].map(h => h.trim());
+  const data = [];
 
   for (let r = 1; r < rows.length; r++) {
     const cols = rows[r];
-    if (!cols.some(c => norm(c))) continue;
+    if (!cols.some(c => String(c || "").trim() !== "")) continue;
+
     const obj = {};
-    for (let c = 0; c < header.length; c++) obj[header[c]] = norm(cols[c]);
-    out.push(obj);
+    for (let c = 0; c < header.length; c++) {
+      obj[header[c]] = (cols[c] ?? "").trim();
+    }
+    data.push(obj);
   }
-  return out;
+
+  return data;
 }
 
 async function fetchCSV(url) {
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`CSV error ${res.status}`);
-  const txt = await res.text();
-  return parseCSV(txt);
+  if (!res.ok) throw new Error(`No se pudo cargar CSV: ${res.status}`);
+  const text = await res.text();
+  return parseCSV(text);
 }
 
-function waLink() {
-  const phone = window.MENU_CONFIG?.whatsappPhoneE164 || "";
-  const name = window.MENU_CONFIG?.businessName || "Las Cremosas";
-  const msg = encodeURIComponent(`Hola ${name}! Quiero hacer un pedido 😊🍓`);
-  return `https://wa.me/${phone}?text=${msg}`;
+function normalizeBool(v, defaultVal = true) {
+  const s = String(v ?? "").trim().toLowerCase();
+  if (!s) return defaultVal;
+  if (["si", "sí", "true", "1", "yes", "y"].includes(s)) return true;
+  if (["no", "false", "0", "n"].includes(s)) return false;
+  return defaultVal;
 }
 
-function groupBy(arr, keyFn) {
-  const m = new Map();
-  for (const x of arr) {
-    const k = keyFn(x) || "";
-    if (!m.has(k)) m.set(k, []);
-    m.get(k).push(x);
+function buildCategories(items) {
+  const set = new Set();
+  for (const it of items) {
+    const cat = (it.Categoria || it.Category || "").trim();
+    if (cat) set.add(cat);
   }
-  return m;
+  return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
 }
 
-function buildSectionOptions(rows) {
-  const sel = $("#categorySelect");
-  sel.innerHTML = "";
-
-  const opt0 = document.createElement("option");
-  opt0.value = "";
-  opt0.textContent = "Todas las secciones";
-  sel.appendChild(opt0);
-
-  const set = new Set(rows.map(r => r.seccion).filter(Boolean));
-  const list = Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
-  for (const s of list) {
-    const opt = document.createElement("option");
-    opt.value = s;
-    opt.textContent = s;
-    sel.appendChild(opt);
-  }
-}
-
-function applyFilters(rows) {
-  const q = normLower(state.q);
-  const sec = norm(state.sectionFilter);
+function applyFilters(items) {
+  const q = state.q.trim().toLowerCase();
+  const cat = state.category;
   const onlyAvail = state.onlyAvailable;
 
-  return rows.filter(r => {
-    if (onlyAvail && !r.disponible) return false;
-    if (sec && r.seccion !== sec) return false;
+  return items.filter(it => {
+    const available = normalizeBool(it.Disponible, true);
+    if (onlyAvail && !available) return false;
+
+    if (cat) {
+      const c = (it.Categoria || "").trim();
+      if (c !== cat) return false;
+    }
 
     if (q) {
-      const hay = `${r.seccion} ${r.subseccion} ${r.nombre} ${r.descripcion}`.toLowerCase();
+      const hay = [
+        it.Nombre, it.Descripcion, it.Categoria,
+        it.Tags, it.Badges, it.Notas
+      ].map(x => String(x || "").toLowerCase()).join(" ");
       return hay.includes(q);
     }
+
     return true;
   });
 }
 
-function setMeta(count) {
-  $("#lastUpdated").textContent = `Actualizado: ${new Date().toLocaleString("es-MX")}`;
-  $("#itemsCount").textContent = `${count} visibles`;
+function renderCategoriesSelect(categories) {
+  const sel = $("#categorySelect");
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = "Todas las categorías";
+  sel.innerHTML = "";
+  sel.appendChild(first);
+
+  for (const c of categories) {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    sel.appendChild(opt);
+  }
 }
 
-function renderPoster(rows) {
+function renderMenu(items) {
   const grid = $("#menuGrid");
   const empty = $("#emptyState");
   grid.innerHTML = "";
 
-  if (!rows.length) {
+  if (!items.length) {
     empty.classList.remove("hidden");
     return;
   }
   empty.classList.add("hidden");
 
-  // Secciones ordenadas por OrdenSeccion
-  const bySec = groupBy(rows, r => r.seccion || "Menú");
-  const sections = Array.from(bySec.entries()).sort((a, b) => {
-    const ao = Math.min(...a[1].map(x => x.ordenSeccion));
-    const bo = Math.min(...b[1].map(x => x.ordenSeccion));
-    return ao - bo || a[0].localeCompare(b[0], "es");
-  });
+  for (const it of items) {
+    const name = it.Nombre || "Sin nombre";
+    const desc = it.Descripcion || "";
+    const price = it.Precio || it.PrecioMXN || "";
+    const currency = window.MENU_CONFIG?.currency || "MXN";
 
-  for (const [secName, secRows] of sections) {
-    const secEl = document.createElement("section");
-    secEl.className = "poster-section";
+    const badgesRaw = (it.Badges || it.Etiquetas || "")
+      .split("|")
+      .map(s => s.trim())
+      .filter(Boolean);
 
-    const h = document.createElement("h3");
-    h.className = "poster-title";
-    h.textContent = secName;
-    secEl.appendChild(h);
+    const note = (it.Notas || "").trim();
+    if (note) badgesRaw.push(note);
 
-    // Subsecciones dentro de la sección
-    const bySub = groupBy(secRows, r => r.subseccion || "General");
-    const subs = Array.from(bySub.entries()).sort((a, b) => {
-      const ao = Math.min(...a[1].map(x => x.ordenItem));
-      const bo = Math.min(...b[1].map(x => x.ordenItem));
-      return ao - bo || a[0].localeCompare(b[0], "es");
-    });
+    const card = document.createElement("article");
+    card.className = "card";
 
-    for (const [subName, subRows] of subs) {
-      const block = document.createElement("div");
-      block.className = "poster-block";
+    const top = document.createElement("div");
+    top.className = "card__top";
 
-      const sh = document.createElement("div");
-      sh.className = "poster-subtitle";
-      sh.textContent = subName;
-      block.appendChild(sh);
+    const left = document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "card__name";
+    title.textContent = name;
+    left.appendChild(title);
 
-      subRows.sort((a, b) => a.ordenItem - b.ordenItem);
-
-      const list = document.createElement("div");
-      list.className = "poster-list";
-
-      for (const r of subRows) {
-        const row = document.createElement("div");
-        row.className = "poster-row";
-
-        // Si NO tiene precio, lo tratamos como "incluye"
-        const hasPrice = !!norm(r.precio);
-        if (!hasPrice) row.classList.add("poster-row--info");
-
-        const left = document.createElement("div");
-        left.className = "poster-left";
-
-        const name = document.createElement("div");
-        name.className = "poster-name";
-        name.textContent = r.nombre;
-
-        const desc = document.createElement("div");
-        desc.className = "poster-desc";
-        desc.textContent = r.descripcion;
-
-        left.appendChild(name);
-        if (norm(r.descripcion)) left.appendChild(desc);
-
-        const price = document.createElement("div");
-        price.className = "poster-price";
-        price.textContent = hasPrice ? formatPrice(r.precio) : "Incluye";
-
-        row.appendChild(left);
-        row.appendChild(price);
-        list.appendChild(row);
-      }
-
-      block.appendChild(list);
-      secEl.appendChild(block);
+    if (desc) {
+      const p = document.createElement("div");
+      p.className = "card__desc";
+      p.textContent = desc;
+      left.appendChild(p);
     }
 
-    grid.appendChild(secEl);
+    const priceEl = document.createElement("div");
+    priceEl.className = "card__price";
+    priceEl.textContent = price ? formatPrice(price, currency) : "—";
+
+    top.appendChild(left);
+    top.appendChild(priceEl);
+    card.appendChild(top);
+
+    if (badgesRaw.length) {
+      const badges = document.createElement("div");
+      badges.className = "badges";
+
+      for (const b of badgesRaw.slice(0, 4)) {
+        const span = document.createElement("span");
+        span.className = "badge";
+        const bLower = b.toLowerCase();
+
+        if (bLower.includes("más vendido") || bLower.includes("mas vendido") || bLower.includes("top")) {
+          span.classList.add("badge--fav");
+        }
+        if (bLower.includes("🔥") || bLower.includes("hot") || bLower.includes("picante")) {
+          span.classList.add("badge--hot");
+        }
+        if (b === note) {
+          span.classList.add("badge--note");
+        }
+
+        span.textContent = b;
+        badges.appendChild(span);
+      }
+
+      card.appendChild(badges);
+    }
+
+    grid.appendChild(card);
   }
 }
 
@@ -247,43 +233,234 @@ function renderExtras(extras) {
   const tUl = $("#extrasToppings");
   const bUl = $("#extrasBases");
   const cUl = $("#extrasChocolates");
-  if (!tUl || !bUl || !cUl) return;
 
   tUl.innerHTML = "";
   bUl.innerHTML = "";
   cUl.innerHTML = "";
 
-  const tops = [];
+  const toppings = [];
   const bases = [];
-  const chocs = [];
+  const chocolates = [];
 
   for (const ex of extras) {
-    const tipo = normLower(ex.tipo);
-    const name = norm(ex.nombre);
+    const type = (ex.Tipo || "").trim().toLowerCase();
+    const name = (ex.Nombre || "").trim();
     if (!name) continue;
 
-    if (tipo.includes("topping")) tops.push(name);
-    else if (tipo.includes("base") || tipo.includes("jarabe")) bases.push(name);
-    else if (tipo.includes("chocolate")) chocs.push(name);
+    if (type.includes("topping")) toppings.push(name);
+    else if (type.includes("base") || type.includes("jarabe")) bases.push(name);
+    else if (type.includes("chocolate")) chocolates.push(name);
   }
 
-  for (const n of tops.sort((a, b) => a.localeCompare(b, "es"))) {
-    const li = document.createElement("li"); li.textContent = n; tUl.appendChild(li);
+  for (const name of toppings.sort((a, b) => a.localeCompare(b, "es"))) {
+    const li = document.createElement("li");
+    li.textContent = name;
+    tUl.appendChild(li);
   }
-  for (const n of bases.sort((a, b) => a.localeCompare(b, "es"))) {
-    const li = document.createElement("li"); li.textContent = n; bUl.appendChild(li);
+
+  for (const name of bases.sort((a, b) => a.localeCompare(b, "es"))) {
+    const li = document.createElement("li");
+    li.textContent = name;
+    bUl.appendChild(li);
   }
-  for (const n of chocs.sort((a, b) => a.localeCompare(b, "es"))) {
-    const li = document.createElement("li"); li.textContent = n; cUl.appendChild(li);
+
+  for (const name of chocolates.sort((a, b) => a.localeCompare(b, "es"))) {
+    const li = document.createElement("li");
+    li.textContent = name;
+    cUl.appendChild(li);
+  }
+}
+
+function setMeta() {
+  const now = new Date();
+  $("#lastUpdated").textContent = `Actualizado: ${now.toLocaleString("es-MX")}`;
+  $("#itemsCount").textContent = `${state.items.length} productos`;
+}
+
+function buildWhatsAppLink() {
+  const phone = window.MENU_CONFIG?.whatsappPhoneE164 || "";
+  const name = window.MENU_CONFIG?.businessName || "Las Cremosas";
+  const msg = encodeURIComponent(`Hola ${name}! Quiero hacer un pedido 😊🍓`);
+  return `https://wa.me/${phone}?text=${msg}`;
+}
+
+function populateSaleProducts() {
+  const sel = $("#saleProduct");
+  sel.innerHTML = `<option value="">Selecciona un producto</option>`;
+
+  const visibles = state.items
+    .filter(it => normalizeBool(it.Disponible, true))
+    .sort((a, b) => (a.Nombre || "").localeCompare((b.Nombre || ""), "es"));
+
+  for (const item of visibles) {
+    const option = document.createElement("option");
+    option.value = item.Nombre || "";
+    option.textContent = `${item.Nombre || "Sin nombre"} — ${formatPrice(item.Precio || 0)}`;
+    option.dataset.price = toNumber(item.Precio || 0);
+    sel.appendChild(option);
+  }
+}
+
+function getTodayString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function normalizeDateString(value) {
+  if (!value) return "";
+  const v = String(value).trim();
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+
+  const parts = v.split(/[\/-]/);
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      const [y, m, d] = parts;
+      return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    } else {
+      const [d, m, y] = parts;
+      if (y && m && d) {
+        return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      }
+    }
+  }
+
+  return v;
+}
+
+function buildSummary() {
+  const today = getTodayString();
+
+  const todaySales = state.sales.filter(s => normalizeDateString(s.fecha) === today);
+  const todayExpenses = state.expenses.filter(e => normalizeDateString(e.fecha) === today);
+
+  const totalSales = todaySales.reduce((acc, s) => acc + toNumber(s.total), 0);
+  const totalExpenses = todayExpenses.reduce((acc, e) => acc + toNumber(e.monto), 0);
+  const profit = totalSales - totalExpenses;
+
+  $("#salesTodayTotal").textContent = formatPrice(totalSales);
+  $("#expensesTodayTotal").textContent = formatPrice(totalExpenses);
+  $("#profitTodayTotal").textContent = formatPrice(profit);
+  $("#salesCountToday").textContent = String(todaySales.length);
+
+  const grouped = {};
+  for (const sale of todaySales) {
+    const name = sale.producto || "Producto";
+    const qty = toNumber(sale.cantidad);
+    grouped[name] = (grouped[name] || 0) + qty;
+  }
+
+  const topProducts = Object.entries(grouped)
+    .sort((a, b) => b[1] - a[1]);
+
+  const container = $("#topProductsToday");
+  container.innerHTML = "";
+
+  if (!topProducts.length) {
+    container.innerHTML = `<div class="mini-list__empty">Todavía no hay ventas registradas hoy.</div>`;
+    return;
+  }
+
+  for (const [name, qty] of topProducts) {
+    const row = document.createElement("div");
+    row.className = "mini-list__row";
+    row.innerHTML = `<span>${name}</span><strong>${qty}</strong>`;
+    container.appendChild(row);
+  }
+}
+
+function showAdminMessage(message, type = "success") {
+  const box = $("#adminMessage");
+  box.textContent = message;
+  box.className = `status-message status-message--${type}`;
+  box.classList.remove("hidden");
+
+  setTimeout(() => {
+    box.classList.add("hidden");
+  }, 3500);
+}
+
+async function sendToApi(payload) {
+  const saveUrl = window.MENU_CONFIG?.api?.saveUrl || "";
+  if (!saveUrl || saveUrl.includes("PEGA_AQUI")) {
+    throw new Error("Falta configurar la URL del Google Apps Script en js/config.js");
+  }
+
+  const res = await fetch(saveUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const text = await res.text();
+  let data = {};
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = { ok: false, message: text };
+  }
+
+  if (!res.ok || !data.ok) {
+    throw new Error(data.message || "No se pudo guardar la información");
+  }
+
+  return data;
+}
+
+async function loadSalesAndExpenses() {
+  const { ventasCsvUrl, gastosCsvUrl } = window.MENU_CONFIG?.sheets || {};
+
+  if (!ventasCsvUrl || !gastosCsvUrl || ventasCsvUrl.includes("PEGA_AQUI") || gastosCsvUrl.includes("PEGA_AQUI")) {
+    buildSummary();
+    return;
+  }
+
+  try {
+    const [sales, expenses] = await Promise.all([
+      fetchCSV(ventasCsvUrl),
+      fetchCSV(gastosCsvUrl)
+    ]);
+
+    state.sales = sales.map(row => ({
+      fecha: row.fecha || row.Fecha || "",
+      hora: row.hora || row.Hora || "",
+      producto: row.producto || row.Producto || "",
+      cantidad: row.cantidad || row.Cantidad || "0",
+      precio_unitario: row.precio_unitario || row.Precio_unitario || row["precio unitario"] || "0",
+      total: row.total || row.Total || "0",
+      encargado: row.encargado || row.Encargado || "",
+      notas: row.notas || row.Notas || ""
+    }));
+
+    state.expenses = expenses.map(row => ({
+      fecha: row.fecha || row.Fecha || "",
+      hora: row.hora || row.Hora || "",
+      concepto: row.concepto || row.Concepto || "",
+      categoria: row.categoria || row.Categoria || "",
+      monto: row.monto || row.Monto || "0",
+      encargado: row.encargado || row.Encargado || "",
+      notas: row.notas || row.Notas || ""
+    }));
+
+    buildSummary();
+  } catch (err) {
+    console.error(err);
+    showAdminMessage("No pude cargar ventas/gastos para el corte.", "error");
   }
 }
 
 function setupUI() {
   $("#yearNow").textContent = new Date().getFullYear();
 
-  const w = waLink();
-  $("#btnWhats").href = w;
-  $("#ctaWhats").href = w;
+  const whats = buildWhatsAppLink();
+  $("#btnWhats").href = whats;
+  $("#ctaWhats").href = whats;
 
   $("#searchInput").addEventListener("input", (e) => {
     state.q = e.target.value || "";
@@ -291,7 +468,7 @@ function setupUI() {
   });
 
   $("#categorySelect").addEventListener("change", (e) => {
-    state.sectionFilter = e.target.value || "";
+    state.category = e.target.value || "";
     rerender();
   });
 
@@ -301,9 +478,15 @@ function setupUI() {
   });
 
   $("#btnShare").addEventListener("click", async () => {
+    const shareData = {
+      title: document.title,
+      text: "Mira el menú de Las Cremosas 🍓",
+      url: location.href
+    };
+
     try {
       if (navigator.share) {
-        await navigator.share({ title: document.title, text: "Menú Las Cremosas 🍓", url: location.href });
+        await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(location.href);
         alert("Link copiado ✅");
@@ -312,60 +495,171 @@ function setupUI() {
   });
 
   const dlg = $("#howDialog");
-  $("#openHow")?.addEventListener("click", (e) => { e.preventDefault(); dlg.showModal(); });
-  $("#closeHow")?.addEventListener("click", () => dlg.close());
-  dlg?.addEventListener("click", (e) => {
-    const card = dlg.querySelector(".dialog__card");
-    if (!card) return;
-    const r = card.getBoundingClientRect();
-    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-    if (!inside) dlg.close();
+  $("#openHow").addEventListener("click", (e) => {
+    e.preventDefault();
+    dlg.showModal();
+  });
+
+  $("#closeHow").addEventListener("click", () => dlg.close());
+
+  dlg.addEventListener("click", (e) => {
+    const rect = dlg.querySelector(".dialog__card").getBoundingClientRect();
+    const inCard =
+      e.clientX >= rect.left && e.clientX <= rect.right &&
+      e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inCard) dlg.close();
+  });
+
+  $("#saleProduct").addEventListener("change", (e) => {
+    const selected = e.target.selectedOptions[0];
+    const price = selected?.dataset?.price || "";
+    $("#salePrice").value = price;
+  });
+
+  $("#saleForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const producto = $("#saleProduct").value.trim();
+    const cantidad = toNumber($("#saleQty").value);
+    const precio = toNumber($("#salePrice").value);
+    const encargado = $("#saleManager").value.trim();
+    const notas = $("#saleNotes").value.trim();
+
+    if (!producto || cantidad <= 0 || precio < 0) {
+      showAdminMessage("Completa correctamente los datos de la venta.", "error");
+      return;
+    }
+
+    const payload = {
+      action: "saveSale",
+      data: {
+        producto,
+        cantidad,
+        precio_unitario: precio,
+        total: cantidad * precio,
+        encargado,
+        notas
+      }
+    };
+
+    try {
+      await sendToApi(payload);
+      showAdminMessage("Venta guardada correctamente.");
+      $("#saleForm").reset();
+      $("#saleQty").value = 1;
+      await loadSalesAndExpenses();
+    } catch (err) {
+      console.error(err);
+      showAdminMessage(err.message || "No se pudo guardar la venta.", "error");
+    }
+  });
+
+  $("#expenseForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const concepto = $("#expenseConcept").value.trim();
+    const categoria = $("#expenseCategory").value.trim();
+    const monto = toNumber($("#expenseAmount").value);
+    const encargado = $("#expenseManager").value.trim();
+    const notas = $("#expenseNotes").value.trim();
+
+    if (!concepto || !categoria || monto <= 0) {
+      showAdminMessage("Completa correctamente los datos del gasto.", "error");
+      return;
+    }
+
+    const payload = {
+      action: "saveExpense",
+      data: {
+        concepto,
+        categoria,
+        monto,
+        encargado,
+        notas
+      }
+    };
+
+    try {
+      await sendToApi(payload);
+      showAdminMessage("Gasto guardado correctamente.");
+      $("#expenseForm").reset();
+      await loadSalesAndExpenses();
+    } catch (err) {
+      console.error(err);
+      showAdminMessage(err.message || "No se pudo guardar el gasto.", "error");
+    }
+  });
+
+  $("#refreshSummary").addEventListener("click", async () => {
+    await loadSalesAndExpenses();
+    showAdminMessage("Corte actualizado.");
   });
 }
 
 function rerender() {
-  const filtered = applyFilters(state.rows);
-  renderPoster(filtered);
-  setMeta(filtered.length);
+  const filtered = applyFilters(state.items);
+  renderMenu(filtered);
+  $("#itemsCount").textContent = `${filtered.length} visibles`;
 }
 
 async function main() {
   setupUI();
 
-  const itemsUrl = window.MENU_CONFIG?.sheets?.itemsCsvUrl;
-  const extrasUrl = window.MENU_CONFIG?.sheets?.extrasCsvUrl;
-
-  if (!itemsUrl || !extrasUrl) {
-    $("#lastUpdated").textContent = "Falta configurar links CSV (config.js)";
+  const { itemsCsvUrl, extrasCsvUrl } = window.MENU_CONFIG?.sheets || {};
+  if (!itemsCsvUrl || !extrasCsvUrl || itemsCsvUrl.includes("PASTE_") || extrasCsvUrl.includes("PASTE_")) {
+    $("#lastUpdated").textContent = "Falta configurar los links CSV (js/config.js)";
+    $("#itemsCount").textContent = "—";
+    $("#menuGrid").innerHTML = `
+      <div class="empty">
+        <div class="empty__emoji">🧩</div>
+        <div class="empty__title">Configura tus CSV</div>
+        <div class="empty__subtitle">Abre <code>js/config.js</code> y pega los links de Google Sheets publicados como CSV.</div>
+      </div>
+    `;
     return;
   }
 
   try {
-    const [items, extras] = await Promise.all([fetchCSV(itemsUrl), fetchCSV(extrasUrl)]);
+    const [items, extras] = await Promise.all([
+      fetchCSV(itemsCsvUrl),
+      fetchCSV(extrasCsvUrl)
+    ]);
 
-    // Mapeo exacto a tu sheet actual (Seccion, OrdenSeccion, Subseccion, OrdenItem, Nombre, Descripcion, Precio, Disponible)
-    state.rows = items.map(it => ({
-      seccion: norm(it.Seccion),
-      ordenSeccion: toNum(it.OrdenSeccion, 999999),
-      subseccion: norm(it.Subseccion),
-      ordenItem: toNum(it.OrdenItem, 999999),
-      nombre: norm(it.Nombre),
-      descripcion: norm(it.Descripcion),
-      precio: norm(it.Precio),
-      disponible: isYes(it.Disponible, true),
-    })).filter(r => r.nombre); // sin nombre no mostramos
-
-    state.extras = extras.map(ex => ({
-      tipo: ex.Tipo || ex.Categoria || "",
-      nombre: ex.Nombre || ex.Item || "",
+    state.items = items.map(it => ({
+      ...it,
+      Categoria: it.Categoria || it.Category || "",
+      Nombre: it.Nombre || it.Producto || it.Item || "",
+      Descripcion: it.Descripcion || it.Descripción || "",
+      Precio: it.Precio || it.PrecioMXN || it.Price || "",
+      Disponible: it.Disponible || it.Activo || "Si",
+      Badges: it.Badges || it.Etiquetas || ""
     }));
 
-    buildSectionOptions(state.rows);
-    rerender();
+    state.extras = extras.map(ex => ({
+      ...ex,
+      Tipo: ex.Tipo || ex.Categoria || "",
+      Nombre: ex.Nombre || ex.Item || ""
+    }));
+
+    const categories = buildCategories(state.items);
+    renderCategoriesSelect(categories);
     renderExtras(state.extras);
-  } catch (e) {
-    console.error(e);
-    $("#lastUpdated").textContent = "Error cargando menú (revisa CSV público)";
+    populateSaleProducts();
+
+    setMeta();
+    rerender();
+
+    await loadSalesAndExpenses();
+  } catch (err) {
+    console.error(err);
+    $("#lastUpdated").textContent = "Error cargando datos";
+    $("#menuGrid").innerHTML = `
+      <div class="empty">
+        <div class="empty__emoji">⚠️</div>
+        <div class="empty__title">No pude cargar el menú</div>
+        <div class="empty__subtitle">Revisa que los links CSV estén públicos y correctos (output=csv).</div>
+      </div>
+    `;
   }
 }
 
