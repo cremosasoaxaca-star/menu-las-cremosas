@@ -5,18 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Las Cremosas 🍓 | Menú</title>
   <meta name="description" content="Menú digital de Las Cremosas: fresas con crema, waffles, frappes, snacks y bebidas." />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
-    rel="stylesheet"
-  />
-
-  <!-- ✅ GitHub Pages (repo: /menu-las-cremosas/) + cache-buster -->
-  <link rel="stylesheet" href="/menu-las-cremosas/styles.css?v=21" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
-
 <body>
   <header class="header">
     <div class="header__inner">
@@ -24,7 +17,7 @@
         <div class="brand__logo" aria-hidden="true">🍓</div>
         <div class="brand__text">
           <div class="brand__name">Las Cremosas</div>
-          <div class="brand__tagline">Menú digital</div>
+          <div class="brand__tagline">Menú digital + caja</div>
         </div>
       </div>
 
@@ -39,7 +32,7 @@
     <section class="hero">
       <div class="hero__card">
         <h1>Tu dosis de felicidad 🍓</h1>
-        <p>Menú actualizado desde una hoja en línea. Edita precios y productos en Google Sheets y la web se actualiza.</p>
+        <p>Menú actualizado desde Google Sheets y ahora con registro manual de ventas, gastos y corte de caja.</p>
 
         <div class="controls">
           <div class="search">
@@ -47,8 +40,8 @@
           </div>
 
           <div class="filters">
-            <select id="categorySelect" aria-label="Filtrar por sección">
-              <option value="">Todas las secciones</option>
+            <select id="categorySelect" aria-label="Filtrar por categoría">
+              <option value="">Todas las categorías</option>
             </select>
             <label class="toggle">
               <input id="toggleAvailable" type="checkbox" checked />
@@ -69,7 +62,6 @@
       </div>
 
       <div id="menuGrid" class="grid" aria-live="polite"></div>
-
       <div id="emptyState" class="empty hidden">
         <div class="empty__emoji">😅</div>
         <div class="empty__title">No encontré resultados</div>
@@ -80,7 +72,7 @@
     <section class="section">
       <div class="section__head">
         <h2>Extras</h2>
-        <p class="muted">Toppings, bases y chocolates (algunos con costo variable).</p>
+        <p class="muted">Toppings, bases y chocolates.</p>
       </div>
 
       <div class="extras">
@@ -95,9 +87,129 @@
         <div class="extras__col">
           <h3 class="extras__title">Chocolates</h3>
           <ul id="extrasChocolates" class="list"></ul>
-          <div class="note">* Algunos chocolates son <strong>costo variable</strong>.</div>
+          <div class="note">* Algunos chocolates pueden tener costo variable.</div>
         </div>
       </div>
+    </section>
+
+    <section class="section" id="cajaSection">
+      <div class="section__head">
+        <h2>Caja</h2>
+        <p class="muted">Registro manual de ventas y gastos.</p>
+      </div>
+
+      <div class="admin-grid">
+        <article class="panel">
+          <h3 class="panel__title">Registrar venta</h3>
+          <form id="saleForm" class="form-grid">
+            <div class="field">
+              <label for="saleProduct">Producto</label>
+              <select id="saleProduct" required>
+                <option value="">Selecciona un producto</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="saleQty">Cantidad</label>
+              <input id="saleQty" type="number" min="1" value="1" required />
+            </div>
+
+            <div class="field">
+              <label for="salePrice">Precio unitario</label>
+              <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00" required />
+            </div>
+
+            <div class="field">
+              <label for="saleManager">Encargado</label>
+              <input id="saleManager" type="text" placeholder="Nombre del encargado" />
+            </div>
+
+            <div class="field field--full">
+              <label for="saleNotes">Notas</label>
+              <input id="saleNotes" type="text" placeholder="Ej. cliente pidió sin crema" />
+            </div>
+
+            <div class="field field--full">
+              <button class="btn btn--primary btn--block" type="submit">Guardar venta</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel">
+          <h3 class="panel__title">Registrar gasto</h3>
+          <form id="expenseForm" class="form-grid">
+            <div class="field">
+              <label for="expenseConcept">Concepto</label>
+              <input id="expenseConcept" type="text" placeholder="Ej. harina" required />
+            </div>
+
+            <div class="field">
+              <label for="expenseCategory">Categoría</label>
+              <select id="expenseCategory" required>
+                <option value="">Selecciona categoría</option>
+                <option value="Insumos">Insumos</option>
+                <option value="Servicios">Servicios</option>
+                <option value="Renta">Renta</option>
+                <option value="Personal">Personal</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="expenseAmount">Monto</label>
+              <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
+            </div>
+
+            <div class="field">
+              <label for="expenseManager">Encargado</label>
+              <input id="expenseManager" type="text" placeholder="Nombre del encargado" />
+            </div>
+
+            <div class="field field--full">
+              <label for="expenseNotes">Notas</label>
+              <input id="expenseNotes" type="text" placeholder="Ej. compra en abarrotes" />
+            </div>
+
+            <div class="field field--full">
+              <button class="btn btn--primary btn--block" type="submit">Guardar gasto</button>
+            </div>
+          </form>
+        </article>
+      </div>
+
+      <div class="section__head section__head--mt">
+        <h2>Corte del día</h2>
+        <button id="refreshSummary" class="btn btn--ghost" type="button">Actualizar corte</button>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-card__label">Ventas del día</div>
+          <div id="salesTodayTotal" class="summary-card__value">$0.00</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Gastos del día</div>
+          <div id="expensesTodayTotal" class="summary-card__value">$0.00</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Utilidad aproximada</div>
+          <div id="profitTodayTotal" class="summary-card__value">$0.00</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Número de ventas</div>
+          <div id="salesCountToday" class="summary-card__value">0</div>
+        </div>
+      </div>
+
+      <div class="panel panel--mt">
+        <h3 class="panel__title">Productos vendidos hoy</h3>
+        <div id="topProductsToday" class="mini-list">
+          <div class="mini-list__empty">Todavía no hay ventas registradas hoy.</div>
+        </div>
+      </div>
+
+      <div id="adminMessage" class="status-message hidden"></div>
     </section>
 
     <section class="section">
@@ -121,7 +233,9 @@
           <span class="dot">•</span>
           <a href="#" id="openHow" class="link">¿Cómo se actualiza?</a>
         </div>
-        <div class="footer__small muted">Hecho para verse bien en cualquier dispositivo.</div>
+        <div class="footer__small muted">
+          Hecho para verse bien en cualquier dispositivo.
+        </div>
       </div>
     </footer>
   </main>
@@ -137,22 +251,19 @@
       </div>
 
       <ol class="steps">
-        <li>Edita tu hoja <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> en Google Sheets.</li>
-        <li>En Sheets: <strong>Archivo → Compartir → Publicar en la web</strong>.</li>
-        <li>Publica cada hoja como <strong>CSV</strong> y copia los links.</li>
-        <li>Pega esos links en <code>config.js</code>.</li>
-        <li>Sube estos archivos a GitHub y activa <strong>GitHub Pages</strong>.</li>
+        <li>Edita tus hojas <strong>DATA_ITEMS</strong>, <strong>DATA_EXTRAS</strong>, <strong>VENTAS</strong> y <strong>GASTOS</strong>.</li>
+        <li>Publica como CSV las hojas que deban leerse desde la web.</li>
+        <li>Pega esos links en <code>js/config.js</code>.</li>
+        <li>Configura la URL de tu <strong>Google Apps Script</strong> para guardar ventas y gastos.</li>
       </ol>
 
       <div class="hint">
-        Tip: si quieres “ocultar” algo sin borrar, pon <strong>Disponible = No</strong>.
+        Tip: el menú sigue siendo público, pero la caja conviene usarla solo internamente.
       </div>
     </div>
   </dialog>
 
-  <!-- ✅ GitHub Pages (repo: /menu-las-cremosas/) + cache-buster -->
-  <script src="/menu-las-cremosas/config.js?v=21"></script>
- <script src="/menu-las-cremosas/app.js?v=50"></script>
-
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
