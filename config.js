@@ -1,11 +1,16 @@
 window.MENU_CONFIG = {
   businessName: "Las Cremosas",
   currency: "MXN",
-  whatsappPhoneE164: "529515903045", // +52 951 590 3045 (sin signos)
+  whatsappPhoneE164: "529515903045",
 
   sheets: {
     itemsCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vROnrnQup5_8IsgYh-Rk7Ahpo8ZZc-OuwIls2thA2q_vBAxzcygRjS4o38OnTdnzkR5EHSojXzWR2sn/pub?gid=1404487164&single=true&output=csv",
-    
-    extrasCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vROnrnQup5_8IsgYh-Rk7Ahpo8ZZc-OuwIls2thA2q_vBAxzcygRjS4o38OnTdnzkR5EHSojXzWR2sn/pub?gid=247763859&single=true&output=csv"
+    extrasCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vROnrnQup5_8IsgYh-Rk7Ahpo8ZZc-OuwIls2thA2q_vBAxzcygRjS4o38OnTdnzkR5EHSojXzWR2sn/pub?gid=247763859&single=true&output=csv",
+    ventasCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlmkezaBxVTEe__UnUkc2oej9904R3a8MoH6wzyOtCA44XPnWycL71wh__DNtFqQ/pub?gid=413264831&single=true&output=csv",
+    gastosCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlmkezaBxVTEe__UnUkc2oej9904R3a8MoH6wzyOtCA44XPnWycL71wh__DNtFqQ/pub?gid=545924440&single=true&output=csv"
+  },
+
+  api: {
+    saveUrl: "https://script.google.com/macros/s/AKfycbxr1xkW5r6fbj1aazhOcfRD2IGk81CdAnIaE20ldOTCFIGhF7pP4O0BrzXEvoa4qxtS5A/exec"
   }
 };
