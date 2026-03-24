@@ -136,38 +136,29 @@ const S = { items:[], extras:[], sales:[], expenses:[], q:"", cat:"", avail:true
    que pueda venir del sheet
 ─────────────────────────────────────────── */
 function normalizeItem(r) {
-  // Buscar la key de categoría de forma flexible (cualquier columna que empiece con "Cat")
-  const catKey = Object.keys(r).find(k => /^cat/i.test(k.trim())) || "Categoria";
-  const cat = r[catKey] || r.Categoria || r.Category || r.categoria || "";
-
-  // Buscar variante de forma flexible
-  const varKey = Object.keys(r).find(k => /variante|tama/i.test(k)) || "";
-  const variante = (varKey ? r[varKey] : "") || r["Variante/Tamaño"] || r.Variante || r.Tamaño || "";
-
-  // Buscar descripción flexible
-  const descKey = Object.keys(r).find(k => /descrip/i.test(k)) || "";
-  const desc = (descKey ? r[descKey] : "") || r.Descripcion || r.Description || "";
-
+  // Columnas reales del sheet: Seccion, Subseccion, OrdenSeccion, OrdenItem, Nombre, Descripcion, Precio, Disponible
   return {
-    Categoria:   cat,
-    Nombre:      r.Producto    || r.Nombre       || r.Item   || "",
-    Variante:    variante,
-    Descripcion: desc,
-    Precio:      r.Precio      || r.PrecioMXN    || r.Price  || "",
-    Disponible:  r.Activo      || r.Disponible   || "Sí",
-    Badges:      r.Badges      || r.Etiquetas    || "",
-    Notas:       r.Notas       || "",
+    Categoria:   r.Seccion      || r.Categoria   || r.Category  || "",
+    Nombre:      r.Nombre       || r.Producto     || r.Item      || "",
+    // Subseccion es agrupador ("Escoge tu tamaño"), no variante visible en card
+    Variante:    r["Variante/Tamaño"] || r.Variante || "",
+    Descripcion: r.Descripcion  || r["Descripción"] || r.Description || "",
+    Precio:      r.Precio       || r.PrecioMXN   || r.Price     || "",
+    Disponible:  r.Disponible   || r.Activo      || "Sí",
+    Badges:      r.Badges       || r.Etiquetas   || "",
+    Notas:       r.Notas        || "",
+    Subseccion:  r.Subseccion   || "",  // guardamos para agrupar si se necesita
   };
 }
 
 function normalizeExtra(r) {
   return {
-    Tipo:       r.Tipo       || r.Categoria || "",
-    Nombre:     r.Nombre     || r.Item      || "",
-    Precio:     r.Precio     || "",
-    Activo:     r.Activo     || r.Disponible || "Sí",
-    TipoPrecio: r["Tipo de precio"] || r.TipoPrecio || "",
-    Notas:      r.Notas      || "",
+    Tipo:       r.Tipo        || r.Categoria  || "",
+    Nombre:     r.Nombre      || r.Item       || "",
+    Precio:     r.Precio      || "",
+    Activo:     r.Activo      || r.Disponible || "Sí",
+    TipoPrecio: r["Tipo de precio"] || r.TipoPrecio || r["tipo de precio"] || "",
+    Notas:      r.Notas       || "",
   };
 }
 
@@ -182,9 +173,10 @@ function getSec(cat) {
     .replace(/[úùûü]/g,"u").replace(/ñ/g,"n")
     .replace(/\s+/g," ").trim();
 
-  // Fresas con crema — muchas variaciones posibles
+  // Fresas con crema — valor exacto del sheet es "Fresas con crema"
   if (s === "fresas con crema" || s === "fresa con crema" ||
-      s.startsWith("fresas con") || s.includes("con crema")) return "fresas";
+      s.startsWith("fresas con") || s.includes("con crema") ||
+      s === "fresas") return "fresas";
 
   // Fresas especiales / golosas
   if (s === "fresas especiales" || s === "fresa especial" ||
