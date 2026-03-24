@@ -260,41 +260,137 @@
   }
 
   /* ══ MODAL ═════════════════════════ */
+
+  // Secciones que SÍ pueden llevar extras (toppings, chocolates, bases)
+  const SECCIONES_CON_EXTRAS = ["fresas con crema","fresas especiales","waffles","waffle","waffles"];
+
+  function productoAceptaExtras(item) {
+    const sec = String(item.Seccion||item.Categoria||"").toLowerCase()
+      .replace(/[áàä]/g,"a").replace(/[éèë]/g,"e")
+      .replace(/[íìï]/g,"i").replace(/[óòö]/g,"o").replace(/[úùü]/g,"u").trim();
+    // Aceptan extras: Fresas con crema, Fresas especiales, Waffles y Frappes
+    return sec.includes("fresas") || sec.includes("waffle") || sec.includes("frappe");
+  }
+
   function openModalC(item) {
     CS.modalItem=item; CS.modalQty=1; CS.modalExtras=[];
     const base=numC(item.Precio);
     if($c("#modalProductName")) $c("#modalProductName").textContent=item.Nombre;
-    if($c("#modalProductBase")) $c("#modalProductBase").textContent=`Base: ${base>0?fmtC(base):"Variable"}`;
+    if($c("#modalProductBase")) $c("#modalProductBase").textContent=`Precio base: ${base>0?fmtC(base):"Variable"}`;
     if($c("#modalQty")) $c("#modalQty").textContent="1";
     if($c("#modalPrice")) $c("#modalPrice").value=base||"";
 
-    // Extras con precio
+    const extrasSection=$c("#modalExtrasSection");
     const grid=$c("#modalExtrasGrid");
-    if(grid){
-      grid.innerHTML="";
-      const extras=CS.extras.filter(ex=>boolC(ex.Activo||ex.Disponible,true)&&numC(ex.Precio)>0);
-      if(extras.length>0&&$c("#modalExtrasSection")) $c("#modalExtrasSection").style.display="";
-      else if($c("#modalExtrasSection")) $c("#modalExtrasSection").style.display="none";
 
-      extras.forEach(ex=>{
-        const p=numC(ex.Precio);
-        const btn=document.createElement("button");
-        btn.className="caja-extra-btn";
-        btn.innerHTML=`${ex.Nombre} <span style="opacity:.7;font-size:11px">+${fmtC(p)}</span>`;
-        btn.addEventListener("click",()=>{
-          const idx=CS.modalExtras.findIndex(e=>e.nombre===ex.Nombre);
-          if(idx>=0){CS.modalExtras.splice(idx,1);btn.classList.remove("caja-extra-btn--on");}
-          else{CS.modalExtras.push({nombre:ex.Nombre,precio:p});btn.classList.add("caja-extra-btn--on");}
-          recalcModalC();
+    // Solo mostrar extras si el producto los acepta
+    if(!productoAceptaExtras(item)){
+      if(extrasSection) extrasSection.style.display="none";
+    } else {
+      if(extrasSection) extrasSection.style.display="";
+      if(grid){
+        grid.innerHTML="";
+
+        // ── Extras con precio FIJO (botones seleccionables) ──
+        const fijos=CS.extras.filter(ex=>{
+          if(!boolC(ex.Activo||ex.Disponible,true))return false;
+          const p=numC(ex.Precio);
+          const tp=String(ex.TipoPrecio||"").toLowerCase();
+          return p>0&&(tp.includes("fijo")||tp.includes("costo extra")||tp.includes("incluido"));
         });
-        grid.appendChild(btn);
-      });
+
+        if(fijos.length>0){
+          const labelFijo=document.createElement("p");
+          labelFijo.style.cssText="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4);margin-bottom:6px;";
+          labelFijo.textContent="Precio fijo";
+          grid.appendChild(labelFijo);
+
+          const wrapFijo=document.createElement("div");
+          wrapFijo.style.cssText="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;";
+          fijos.forEach(ex=>{
+            const p=numC(ex.Precio);
+            const btn=document.createElement("button");
+            btn.className="caja-extra-btn";
+            btn.innerHTML=`${ex.Nombre} <span style="opacity:.7;font-size:11px">+${fmtC(p)}</span>`;
+            btn.addEventListener("click",()=>{
+              const idx=CS.modalExtras.findIndex(e=>e.nombre===ex.Nombre);
+              if(idx>=0){CS.modalExtras.splice(idx,1);btn.classList.remove("caja-extra-btn--on");}
+              else{CS.modalExtras.push({nombre:ex.Nombre,precio:p});btn.classList.add("caja-extra-btn--on");}
+              recalcModalC();
+            });
+            wrapFijo.appendChild(btn);
+          });
+          grid.appendChild(wrapFijo);
+        }
+
+        // ── Extras con precio VARIABLE (el encargado escribe el precio) ──
+        const variables=CS.extras.filter(ex=>{
+          if(!boolC(ex.Activo||ex.Disponible,true))return false;
+          const tp=String(ex.TipoPrecio||"").toLowerCase();
+          const p=numC(ex.Precio);
+          return p===0&&(tp.includes("variable")||tp.includes("costo variable"));
+        });
+
+        if(variables.length>0){
+          const labelVar=document.createElement("p");
+          labelVar.style.cssText="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4);margin-bottom:6px;";
+          labelVar.textContent="Costo variable (escribe el precio)";
+          grid.appendChild(labelVar);
+
+          variables.forEach(ex=>{
+            const row=document.createElement("div");
+            row.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px;";
+
+            const toggle=document.createElement("button");
+            toggle.className="caja-extra-btn";
+            toggle.style.flexShrink="0";
+            toggle.textContent=ex.Nombre;
+
+            const priceIn=document.createElement("input");
+            priceIn.type="number";
+            priceIn.min="0";
+            priceIn.placeholder="$ precio";
+            priceIn.style.cssText="width:90px;padding:6px 10px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-weight:700;outline:none;";
+            priceIn.disabled=true;
+
+            toggle.addEventListener("click",()=>{
+              const idx=CS.modalExtras.findIndex(e=>e.nombre===ex.Nombre);
+              if(idx>=0){
+                CS.modalExtras.splice(idx,1);
+                toggle.classList.remove("caja-extra-btn--on");
+                priceIn.disabled=true; priceIn.value="";
+              } else {
+                const p=numC(priceIn.value)||0;
+                CS.modalExtras.push({nombre:ex.Nombre,precio:p,variable:true,inputRef:priceIn});
+                toggle.classList.add("caja-extra-btn--on");
+                priceIn.disabled=false; priceIn.focus();
+              }
+              recalcModalC();
+            });
+
+            priceIn.addEventListener("input",()=>{
+              const idx=CS.modalExtras.findIndex(e=>e.nombre===ex.Nombre);
+              if(idx>=0){
+                CS.modalExtras[idx].precio=numC(priceIn.value)||0;
+                recalcModalC();
+              }
+            });
+
+            row.appendChild(toggle);
+            row.appendChild(priceIn);
+            grid.appendChild(row);
+          });
+        }
+
+        // Si no hay ningún extra disponible
+        if(fijos.length===0&&variables.length===0){
+          grid.innerHTML=`<p style="font-size:13px;color:var(--ink4)">Sin extras disponibles para este producto.</p>`;
+        }
+      }
     }
 
     const priceInput=$c("#modalPrice");
-    if(priceInput){
-      priceInput.oninput=recalcModalC;
-    }
+    if(priceInput) priceInput.oninput=recalcModalC;
 
     $c("#btnQtyMinus").onclick=()=>{if(CS.modalQty>1){CS.modalQty--;if($c("#modalQty"))$c("#modalQty").textContent=CS.modalQty;recalcModalC();}};
     $c("#btnQtyPlus").onclick=()=>{CS.modalQty++;if($c("#modalQty"))$c("#modalQty").textContent=CS.modalQty;recalcModalC();};
@@ -310,7 +406,9 @@
     const base=numC(CS.modalItem?.Precio||0);
     const extrasSum=CS.modalExtras.reduce((a,e)=>a+e.precio,0);
     const priceInput=$c("#modalPrice");
-    if(priceInput&&CS.modalExtras.length>0) priceInput.value=base+extrasSum;
+    // Solo actualizar el precio automáticamente si hay extras fijos seleccionados
+    const tieneExtrasFijos=CS.modalExtras.some(e=>!e.variable);
+    if(priceInput&&tieneExtrasFijos) priceInput.value=base+extrasSum;
     const unit=numC(priceInput?.value||0);
     const sub=unit*CS.modalQty;
     if($c("#modalSubtotal")) $c("#modalSubtotal").textContent=fmtC(sub);
