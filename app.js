@@ -1,12 +1,17 @@
 /* ══════════════════════════════════════════
-   Las Cremosas — app.js v4.1
-   Fix: CORS-safe fetch + error diagnosis
+   Las Cremosas — app.js v4.2
+   Auto refresh del menú desde Google Sheets
    ══════════════════════════════════════════ */
 "use strict";
 
 const $  = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const CFG = window.MENU_CONFIG || {};
+
+/* ── Auto refresh ───────────────────────── */
+let MENU_SNAPSHOT = "";
+let MENU_RELOAD_TIMER = null;
+const MENU_REFRESH_MS = 10000; // cada 10 segundos
 
 /* ── Helpers ───────────────────────────── */
 function fmt(v, cur) {
@@ -64,20 +69,22 @@ function strip(s) {
 /* ── CSV FETCH (CORS-safe) ──────────────────
    Google Sheets public CSV puede fallar con CORS
    en algunos entornos. Usamos dos estrategias:
-   1. fetch directo (funciona en GitHub Pages / hosting normal)
-   2. Si falla, intenta via allorigins.win proxy
+   1. fetch directo
+   2. si falla, proxy público
 ─────────────────────────────────────────── */
 async function fetchText(url) {
-  // Intento 1: directo
   try {
-    const r = await fetch(url, { cache: "no-store", mode: "cors" });
+    const r = await fetch(url, {
+      cache: "no-store",
+      mode: "cors",
+      headers: { "Cache-Control": "no-cache" }
+    });
     if (r.ok) return await r.text();
     throw new Error(`HTTP ${r.status}`);
   } catch(e1) {
     console.warn("Fetch directo falló:", e1.message, "— intentando proxy…");
   }
 
-  // Intento 2: proxy público (solo si el directo falla)
   try {
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     const r = await fetch(proxyUrl, { cache: "no-store" });
@@ -91,7 +98,6 @@ async function fetchText(url) {
 }
 
 function parseCSV(text) {
-  // Detecta si recibimos HTML en vez de CSV (hoja no publicada)
   if (text.trim().startsWith("<!DOCTYPE") || text.trim().startsWith("<html")) {
     throw new Error("La hoja de Google Sheets NO está publicada como CSV. Ve a Archivo → Compartir → Publicar en la web → elige la hoja → CSV.");
   }
@@ -99,7 +105,10 @@ function parseCSV(text) {
   const rows=[]; let cur="",inQ=false,row=[];
   for (let i=0;i<text.length;i++) {
     const c=text[i],nx=text[i+1];
-    if (c==='"') { if(inQ&&nx==='"'){cur+='"';i++;}else inQ=!inQ; }
+    if (c==='"') {
+      if(inQ&&nx==='"'){cur+='"';i++;}
+      else inQ=!inQ;
+    }
     else if (c===','&&!inQ) { row.push(cur);cur=""; }
     else if ((c==='\n'||c==='\r')&&!inQ) {
       if(c==='\r'&&nx==='\n')i++;
@@ -110,7 +119,7 @@ function parseCSV(text) {
   if(!rows.length) return [];
 
   const hdr = rows[0].map(h=>h.trim());
-  console.log("📋 Columnas CSV:", hdr); // Debug: muestra las columnas en consola
+  console.log("📋 Columnas CSV:", hdr);
 
   const data=[];
   for(let r=1;r<rows.length;r++){
@@ -131,23 +140,18 @@ async function csv(url) {
 /* ── State ─────────────────────────────── */
 const S = { items:[], extras:[], sales:[], expenses:[], q:"", cat:"", avail:true };
 
-/* ── Normalizar items
-   Acepta cualquier combinación de nombres de columna
-   que pueda venir del sheet
-─────────────────────────────────────────── */
+/* ── Normalizar items ───────────────────── */
 function normalizeItem(r) {
-  // Columnas reales del sheet: Seccion, Subseccion, OrdenSeccion, OrdenItem, Nombre, Descripcion, Precio, Disponible
   return {
     Categoria:   r.Seccion      || r.Categoria   || r.Category  || "",
-    Nombre:      r.Nombre       || r.Producto     || r.Item      || "",
-    // Subseccion es agrupador ("Escoge tu tamaño"), no variante visible en card
+    Nombre:      r.Nombre       || r.Producto    || r.Item      || "",
     Variante:    r["Variante/Tamaño"] || r.Variante || "",
     Descripcion: r.Descripcion  || r["Descripción"] || r.Description || "",
     Precio:      r.Precio       || r.PrecioMXN   || r.Price     || "",
     Disponible:  r.Disponible   || r.Activo      || "Sí",
     Badges:      r.Badges       || r.Etiquetas   || "",
     Notas:       r.Notas        || "",
-    Subseccion:  r.Subseccion   || "",  // guardamos para agrupar si se necesita
+    Subseccion:  r.Subseccion   || "",
   };
 }
 
@@ -163,9 +167,7 @@ function normalizeExtra(r) {
 }
 
 /* ── Category → section ID ─────────────── */
-// Ultra-robusto: limpia espacios, tildes, mayúsculas y compara
 function getSec(cat) {
-  // Limpia completamente: sin tildes, sin espacios dobles, lowercase, trim
   const s = String(cat||"")
     .toLowerCase()
     .replace(/[áàâä]/g,"a").replace(/[éèêë]/g,"e")
@@ -173,26 +175,17 @@ function getSec(cat) {
     .replace(/[úùûü]/g,"u").replace(/ñ/g,"n")
     .replace(/\s+/g," ").trim();
 
-  // Fresas con crema — valor exacto del sheet es "Fresas con crema"
   if (s === "fresas con crema" || s === "fresa con crema" ||
       s.startsWith("fresas con") || s.includes("con crema") ||
       s === "fresas") return "fresas";
 
-  // Fresas especiales / golosas
   if (s === "fresas especiales" || s === "fresa especial" ||
       s.includes("especial") || s.includes("golosa") ||
       s.includes("chocolate")) return "especiales";
 
-  // Frappes
   if (s === "frappes" || s === "frappe" || s.includes("frappe")) return "frappes";
-
-  // Waffles
   if (s === "waffles" || s === "waffle" || s.includes("waffle")) return "waffles";
-
-  // Snacks
   if (s === "snacks" || s === "snack" || s.includes("snack")) return "snacks";
-
-  // Bebidas
   if (s === "bebidas" || s === "bebida" || s.includes("bebida")) return "bebidas";
 
   console.warn("⚠ Categoria sin sección (valor exacto):", JSON.stringify(cat), "→ normalizado:", JSON.stringify(s));
@@ -223,11 +216,10 @@ function renderAll() {
     const sec   = getSec(it.Categoria);
     const avail = bool(it.Disponible, true);
     if (sec === "fresas") renderSizeCard(it, avail);
-    else if (sec)         renderProdCard(it, avail, sec);
+    else if (sec) renderProdCard(it, avail, sec);
     count++;
   }
 
-  // Mostrar/ocultar secciones
   [
     {id:"sec-fresas",     grid:"#sizes-fresas"},
     {id:"sec-especiales", grid:"#grid-especiales"},
@@ -242,7 +234,8 @@ function renderAll() {
   });
 
   $("#emptyState")?.classList.toggle("hidden", count > 0);
-  const ic=$("#itemsCount"); if(ic) ic.textContent=`${count} productos`;
+  const ic=$("#itemsCount");
+  if(ic) ic.textContent=`${count} productos`;
 }
 
 function renderSizeCard(it, avail) {
@@ -320,7 +313,9 @@ function buildCatSelect() {
   sel.innerHTML=`<option value="">Todas las categorías</option>`;
   cats.forEach(c=>{
     const o=document.createElement("option");
-    o.value=c;o.textContent=c;sel.appendChild(o);
+    o.value=c;
+    o.textContent=c;
+    sel.appendChild(o);
   });
 }
 
@@ -345,11 +340,48 @@ function buildSaleSelect() {
     });
 }
 
-function setMeta() {
+function setMeta(msg = null) {
   const lu=$("#lastUpdated");
-  if(lu) lu.textContent=`${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · actualizado`;
+  if(lu) {
+    lu.textContent = msg || `${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · actualizado`;
+  }
   const ic=$("#itemsCount");
   if(ic) ic.textContent=`${S.items.length} productos`;
+}
+
+/* ── Auto reload del menú ───────────────── */
+async function reloadMenuIfChanged() {
+  const { itemsCsvUrl, extrasCsvUrl } = CFG.sheets || {};
+  if (!itemsCsvUrl || !extrasCsvUrl) return;
+
+  try {
+    const [rawItems, rawExtras] = await Promise.all([
+      csv(itemsCsvUrl),
+      csv(extrasCsvUrl),
+    ]);
+
+    const nextSnapshot = JSON.stringify({
+      items: rawItems,
+      extras: rawExtras,
+    });
+
+    if (nextSnapshot === MENU_SNAPSHOT) return;
+
+    MENU_SNAPSHOT = nextSnapshot;
+
+    S.items = rawItems.map(normalizeItem);
+    S.extras = rawExtras.map(normalizeExtra);
+
+    buildCatSelect();
+    renderExtras();
+    buildSaleSelect();
+    setMeta(`${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · menú actualizado automáticamente`);
+    renderAll();
+
+    console.log("🔄 Menú actualizado automáticamente desde Google Sheets");
+  } catch (err) {
+    console.error("❌ Error al actualizar menú automáticamente:", err);
+  }
 }
 
 /* ── PIN ────────────────────────────────── */
@@ -430,36 +462,39 @@ async function loadFinancials() {
   try {
     const [s,e]=await Promise.all([csv(ventasCsvUrl),csv(gastosCsvUrl)]);
     S.sales=s.map(r=>({
-      fecha:r.fecha||r.Fecha||"",producto:r.producto||r.Producto||"",
-      cantidad:r.cantidad||r.Cantidad||"0",total:r.total||r.Total||"0",
-      encargado:r.encargado||r.Encargado||"",notas:r.notas||r.Notas||"",
+      fecha:r.fecha||r.Fecha||"",
+      producto:r.producto||r.Producto||"",
+      cantidad:r.cantidad||r.Cantidad||"0",
+      total:r.total||r.Total||"0",
+      encargado:r.encargado||r.Encargado||"",
+      notas:r.notas||r.Notas||"",
     }));
     S.expenses=e.map(r=>({
-      fecha:r.fecha||r.Fecha||"",concepto:r.concepto||r.Concepto||"",
-      categoria:r.categoria||r.Categoria||"",monto:r.monto||r.Monto||"0",
-      encargado:r.encargado||r.Encargado||"",notas:r.notas||r.Notas||"",
+      fecha:r.fecha||r.Fecha||"",
+      concepto:r.concepto||r.Concepto||"",
+      categoria:r.categoria||r.Categoria||"",
+      monto:r.monto||r.Monto||"0",
+      encargado:r.encargado||r.Encargado||"",
+      notas:r.notas||r.Notas||"",
     }));
     buildSummary();
   } catch(err){
     console.error("Error financials:",err);
-    showMsg("No pude cargar ventas/gastos: "+err.message,"error");
+    showMsg("No pude cargar ventas/gastos: " + err.message,"error");
   }
 }
 
 /* ── API save ───────────────────────────── */
-// Google Apps Script desde GitHub Pages necesita no-cors + form data
 async function apiPost(payload) {
   const url = CFG.api?.saveUrl || "";
-  if (!url || url.includes("PEGA"))
+  if (!url || url.includes("PEGA")) {
     throw new Error("Configura la URL del Apps Script en config.js");
+  }
 
-  // Usamos fetch con mode no-cors (la única forma que funciona cross-origin con Apps Script)
-  // No podemos leer la respuesta en no-cors, pero el dato SÍ llega al script
   try {
     const form = new FormData();
     form.append("payload", JSON.stringify(payload));
     await fetch(url, { method:"POST", body: form, mode:"no-cors" });
-    // Con no-cors la respuesta es opaca — asumimos éxito si no lanza error de red
     return { ok: true };
   } catch(err) {
     throw new Error("Error de red al guardar: " + err.message);
@@ -468,9 +503,11 @@ async function apiPost(payload) {
 
 function showMsg(txt,type="success"){
   const el=$("#adminMessage");if(!el)return;
-  el.textContent=txt;el.className=`status-msg status-msg--${type}`;
+  el.textContent=txt;
+  el.className=`status-msg status-msg--${type}`;
   el.classList.remove("hidden");
-  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.add("hidden"),5000);
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.add("hidden"),5000);
 }
 
 function previewTotal(){
@@ -487,19 +524,42 @@ async function saveSale(){
   const precio=num($("#salePrice")?.value);
   const encargado=$("#saleManager")?.value.trim();
   const notas=$("#saleNotes")?.value.trim();
-  if(!producto||cantidad<=0||precio<0){showMsg("Completa todos los datos.","error");return;}
-  const btn=$("#btnSaveSale");if(!btn)return;
-  btn.disabled=true;btn.innerHTML=`<span class="spinner"></span> Guardando…`;
+
+  if(!producto||cantidad<=0||precio<0){
+    showMsg("Completa todos los datos.","error");
+    return;
+  }
+
+  const btn=$("#btnSaveSale");
+  if(!btn)return;
+
+  btn.disabled=true;
+  btn.innerHTML=`<span class="spinner"></span> Guardando…`;
+
   try{
-    await apiPost({action:"saveSale",data:{producto,cantidad,precio_unitario:precio,total:cantidad*precio,encargado,notas}});
+    await apiPost({
+      action:"saveSale",
+      data:{
+        producto,
+        cantidad,
+        precio_unitario:precio,
+        total:cantidad*precio,
+        encargado,
+        notas
+      }
+    });
     showMsg("✅ Venta guardada.");
     ["saleManager","saleNotes","salePrice"].forEach(id=>{const e=$(`#${id}`);if(e)e.value="";});
     const sp=$("#saleProduct");if(sp)sp.selectedIndex=0;
     const sq=$("#saleQty");if(sq)sq.value="1";
     const st=$("#saleTotalPreview");if(st)st.textContent="—";
     await loadFinancials();
-  }catch(err){showMsg(err.message||"Error.","error");}
-  finally{btn.disabled=false;btn.innerHTML=ICON_SAVE+" Guardar venta";}
+  }catch(err){
+    showMsg(err.message||"Error.","error");
+  } finally{
+    btn.disabled=false;
+    btn.innerHTML=ICON_SAVE+" Guardar venta";
+  }
 }
 
 async function saveExpense(){
@@ -509,17 +569,33 @@ async function saveExpense(){
   const monto=num($("#expenseAmount")?.value);
   const encargado=$("#expenseManager")?.value.trim();
   const notas=$("#expenseNotes")?.value.trim();
-  if(!concepto||!catRaw||monto<=0){showMsg("Completa todos los datos.","error");return;}
-  const btn=$("#btnSaveExpense");if(!btn)return;
-  btn.disabled=true;btn.innerHTML=`<span class="spinner"></span> Guardando…`;
+
+  if(!concepto||!catRaw||monto<=0){
+    showMsg("Completa todos los datos.","error");
+    return;
+  }
+
+  const btn=$("#btnSaveExpense");
+  if(!btn)return;
+
+  btn.disabled=true;
+  btn.innerHTML=`<span class="spinner"></span> Guardando…`;
+
   try{
-    await apiPost({action:"saveExpense",data:{concepto,categoria,monto,encargado,notas}});
+    await apiPost({
+      action:"saveExpense",
+      data:{concepto,categoria,monto,encargado,notas}
+    });
     showMsg("✅ Gasto guardado.");
     ["expenseConcept","expenseAmount","expenseManager","expenseNotes"].forEach(id=>{const e=$(`#${id}`);if(e)e.value="";});
     const ec=$("#expenseCategory");if(ec)ec.selectedIndex=0;
     await loadFinancials();
-  }catch(err){showMsg(err.message||"Error.","error");}
-  finally{btn.disabled=false;btn.innerHTML=ICON_SAVE+" Guardar gasto";}
+  }catch(err){
+    showMsg(err.message||"Error.","error");
+  } finally{
+    btn.disabled=false;
+    btn.innerHTML=ICON_SAVE+" Guardar gasto";
+  }
 }
 
 /* ── Setup UI ───────────────────────────── */
@@ -527,7 +603,10 @@ function setupUI(){
   const waMsg=encodeURIComponent(`Hola ${CFG.businessName||"Las Cremosas"}! Quiero hacer un pedido 😊🍓`);
   const waLink=`https://wa.me/${CFG.whatsappPhoneE164||""}?text=${waMsg}`;
   ["#btnWhats","#ctaWhats","#heroWhats"].forEach(id=>{const e=$(id);if(e)e.href=waLink;});
-  const yn=$("#yearNow");if(yn)yn.textContent=new Date().getFullYear();
+
+  const yn=$("#yearNow");
+  if(yn)yn.textContent=new Date().getFullYear();
+
   const cd=$("#cajaDate");
   if(cd)cd.textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
@@ -539,12 +618,14 @@ function setupUI(){
     else if(v==="ok")pinOk();
     else pinPress(v);
   }));
+
   document.addEventListener("keydown",e=>{
     if($("#cajaLocked")?.classList.contains("hidden"))return;
     if(e.key>="0"&&e.key<="9")pinPress(e.key);
     else if(e.key==="Backspace")pinDel();
     else if(e.key==="Enter")pinOk();
   });
+
   $("#btnLockCaja")?.addEventListener("click",lockCaja);
 
   $$(".ctab").forEach(t=>t.addEventListener("click",()=>{
@@ -561,8 +642,12 @@ function setupUI(){
 
   $("#btnShare")?.addEventListener("click",async()=>{
     try{
-      if(navigator.share)await navigator.share({title:"Las Cremosas 🍓",text:"Mira el menú",url:location.href});
-      else{await navigator.clipboard.writeText(location.href);alert("¡Link copiado! ✅");}
+      if(navigator.share){
+        await navigator.share({title:"Las Cremosas 🍓",text:"Mira el menú",url:location.href});
+      } else {
+        await navigator.clipboard.writeText(location.href);
+        alert("¡Link copiado! ✅");
+      }
     }catch{}
   });
 
@@ -573,9 +658,11 @@ function setupUI(){
 
   $("#saleProduct")?.addEventListener("change",e=>{
     const o=e.target.selectedOptions[0];
-    const sp=$("#salePrice");if(sp)sp.value=o?.dataset?.price??"";
+    const sp=$("#salePrice");
+    if(sp)sp.value=o?.dataset?.price??"";
     previewTotal();
   });
+
   ["saleQty","salePrice"].forEach(id=>$(`#${id}`)?.addEventListener("input",previewTotal));
   $("#btnSaveSale")?.addEventListener("click",saveSale);
   $("#btnSaveExpense")?.addEventListener("click",saveExpense);
@@ -593,7 +680,6 @@ async function main(){
     return;
   }
 
-  // Mostrar estado de carga
   const lu=$("#lastUpdated");
   if(lu)lu.textContent="Cargando menú…";
 
@@ -602,6 +688,11 @@ async function main(){
       csv(itemsCsvUrl),
       csv(extrasCsvUrl),
     ]);
+
+    MENU_SNAPSHOT = JSON.stringify({
+      items: rawItems,
+      extras: rawExtras,
+    });
 
     console.log(`✅ Items cargados: ${rawItems.length}, Extras: ${rawExtras.length}`);
     if(rawItems.length>0){
@@ -622,14 +713,13 @@ async function main(){
     setMeta();
     renderAll();
 
+    if (MENU_RELOAD_TIMER) clearInterval(MENU_RELOAD_TIMER);
+    MENU_RELOAD_TIMER = setInterval(reloadMenuIfChanged, MENU_REFRESH_MS);
+
   }catch(err){
     console.error("❌ Error al cargar menú:", err);
-    // Mostrar error claro al usuario
-    const lu=$("#lastUpdated");
     if(lu)lu.textContent="⚠ Error al cargar datos";
 
-    // Mostrar mensaje de diagnóstico en el menú
-    const grid=$("#sizes-fresas");
     const page=document.querySelector(".page-wrap");
     if(page){
       const errBox=document.createElement("div");
