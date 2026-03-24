@@ -161,14 +161,31 @@ function normalizeExtra(r) {
 }
 
 /* ── Category → section ID ─────────────── */
+// Mapa directo (nombre exacto del sheet) + fallback parcial
+const SEC_MAP = {
+  "fresas con crema":  "fresas",
+  "fresas especiales": "especiales",
+  "frappes":           "frappes",
+  "frappe":            "frappes",
+  "waffles":           "waffles",
+  "waffle":            "waffles",
+  "snacks":            "snacks",
+  "snack":             "snacks",
+  "bebidas":           "bebidas",
+  "bebida":            "bebidas",
+};
+
 function getSec(cat) {
   const s = strip(cat);
-  if (s.includes("fresas con crema"))                                  return "fresas";
-  if (s.includes("fresas especiales") || s.includes("golosa"))         return "especiales";
-  if (s.includes("frappe"))                                            return "frappes";
-  if (s.includes("waffle"))                                            return "waffles";
-  if (s.includes("snack"))                                             return "snacks";
-  if (s.includes("bebida"))                                            return "bebidas";
+  if (SEC_MAP[s]) return SEC_MAP[s];
+  if (s.includes("fresas con crema"))         return "fresas";
+  if (s.includes("fresas especial"))          return "especiales";
+  if (s.includes("golosa"))                   return "especiales";
+  if (s.includes("frappe"))                   return "frappes";
+  if (s.includes("waffle"))                   return "waffles";
+  if (s.includes("snack"))                    return "snacks";
+  if (s.includes("bebida"))                   return "bebidas";
+  console.warn("Categoria sin sección:", cat);
   return null;
 }
 
@@ -209,7 +226,7 @@ function renderAll() {
     {id:"sec-snacks",     grid:"#grid-snacks"},
     {id:"sec-bebidas",    grid:"#grid-bebidas"},
   ].forEach(({id,grid})=>{
-    const secEl=$(` #${id}`);
+    const secEl=$(`#${id}`);
     const gEl=$(grid);
     if(secEl) secEl.style.display = (gEl && gEl.children.length > 0) ? "" : "none";
   });
@@ -572,6 +589,11 @@ async function main(){
 
     S.items  = rawItems.map(normalizeItem);
     S.extras = rawExtras.map(normalizeExtra);
+
+    // Debug: muestra categorías únicas detectadas
+    const cats = [...new Set(S.items.map(i=>i.Categoria))];
+    console.log("📂 Categorías del sheet:", cats);
+    console.log("📦 Mapeo a secciones:", cats.map(c=>c+" → "+getSec(c)));
 
     buildCatSelect();
     renderExtras();
