@@ -452,17 +452,18 @@
       const [sales,expenses]=await Promise.all([fetchCSVC(ventasCsvUrl),fetchCSVC(gastosCsvUrl)]);
 
       CS.sales=sales.map(r=>({
-        fecha:r.fecha||r.Fecha||"",
-        hora:r.hora||r.Hora||"",
-        producto:r.producto||r.Producto||"",
-        cantidad:numC(r.cantidad||r.Cantidad||1),
-        precio:numC(r.precio||r.precio_unitario||0),
-        extras:r.extras||"",
-        subtotal:numC(r.subtotal||0),
-        total:numC(r.total||r.Total||0),
-        encargado:r.encargado||r.Encargado||"",
-        notas:r.notas||r.Notas||"",
-        folio:r.folio||r.Folio||"",
+        // Columnas reales del sheet: fecha, hora, producto, cantidad, precio_unitario, total, encargado, notas
+        fecha:    r.fecha     || r.Fecha     || "",
+        hora:     r.hora      || r.Hora      || "",
+        producto: r.producto  || r.Producto  || "",
+        cantidad: numC(r.cantidad || r.Cantidad || 1),
+        precio:   numC(r.precio_unitario || r.precio || r.Precio || 0),
+        extras:   r.extras    || r.notas     || "",
+        subtotal: numC(r.total || r.Total || r.subtotal || 0), // tu sheet usa "total" como subtotal por fila
+        total:    numC(r.total || r.Total || 0),
+        encargado:r.encargado || r.Encargado || "",
+        notas:    r.notas     || r.Notas     || "",
+        folio:    r.folio     || r.Folio     || "",
       }));
       CS.expenses=expenses.map(r=>({
         fecha:r.fecha||r.Fecha||"",
@@ -486,24 +487,12 @@
     const sales=CS.sales.filter(s=>normDateC(s.fecha)===td);
     const expenses=CS.expenses.filter(e=>normDateC(e.fecha)===td);
 
-    // Calcular total ventas agrupando por folio
-    const folios={};
-    sales.forEach(s=>{
-      if(s.folio){
-        if(!folios[s.folio])folios[s.folio]={total:s.total,hora:s.hora,enc:s.encargado,items:[]};
-        folios[s.folio].items.push(s);
-      }
-    });
-    const sinFolio=sales.filter(s=>!s.folio);
-    const conFolio=Object.values(folios);
-    let totalVentas=0;
-    conFolio.forEach(f=>totalVentas+=numC(f.total));
-    sinFolio.forEach(s=>totalVentas+=s.subtotal||s.total||0);
-
-    const totalGastos=expenses.reduce((a,e)=>a+e.monto,0);
-    const utilidad=totalVentas-totalGastos;
-    const numVentas=conFolio.length+sinFolio.length;
-    const ticket=numVentas>0?totalVentas/numVentas:0;
+    // Cada fila del sheet es un producto vendido — sumar todos los totales del día
+    const totalVentas = sales.reduce((a,s) => a + s.total, 0);
+    const totalGastos = expenses.reduce((a,e) => a + e.monto, 0);
+    const utilidad    = totalVentas - totalGastos;
+    const numVentas   = sales.length;
+    const ticket      = numVentas > 0 ? totalVentas / numVentas : 0;
 
     // KPIs
     const set=(id,v)=>{const e=$c(id);if(e)e.textContent=v;};
@@ -520,8 +509,8 @@
     sales.forEach(s=>{
       const n=s.producto||"?";
       if(!grouped[n])grouped[n]={qty:0,total:0};
-      grouped[n].qty+=s.cantidad||1;
-      grouped[n].total+=s.subtotal||s.total||0;
+      grouped[n].qty   += numC(s.cantidad)||1;
+      grouped[n].total += s.total||0;
     });
     const sorted=Object.entries(grouped).sort((a,b)=>b[1].qty-a[1].qty);
     const topEl=$c("#topProductos");
@@ -547,7 +536,7 @@
       else sales.slice().reverse().forEach(s=>{
         const row=document.createElement("div");
         row.className="caja-txn-row";
-        row.innerHTML=`<span class="caja-txn-time">${s.hora?s.hora.slice(0,5):""}</span><span class="caja-txn-name">${s.producto||"?"}</span><span class="caja-txn-extras">${s.extras||""}</span><span class="caja-txn-amount">${fmtC(s.subtotal||s.total||0)}</span><span class="caja-txn-enc">${s.encargado||""}</span>`;
+        row.innerHTML=`<span class="caja-txn-time">${s.hora?s.hora.slice(0,5):""}</span><span class="caja-txn-name">${s.producto||"?"}</span><span class="caja-txn-extras">${s.notas||""}</span><span class="caja-txn-amount">${fmtC(s.total||0)}</span><span class="caja-txn-enc">${s.encargado||""}</span>`;
         ventasEl.appendChild(row);
       });
     }
