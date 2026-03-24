@@ -621,3 +621,361 @@ code { background: var(--rose-lt); padding: 2px 7px; border-radius: 5px; font-si
   .corte { grid-template-columns: 1fr }
   .corte-card--p { grid-column: auto }
 }
+
+/* ══════════════════════════════════════════
+   CAJA INTEGRADA — estilos adicionales
+   ══════════════════════════════════════════ */
+
+/* Login de caja */
+.caja-login-screen {
+  min-height: calc(100dvh - 62px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: linear-gradient(145deg, var(--rose-lt) 0%, var(--bg) 100%);
+}
+.caja-login-card {
+  background: var(--surface); border-radius: var(--r-xl);
+  padding: 36px 28px; max-width: 340px; width: 100%;
+  box-shadow: var(--sh-lg); text-align: center;
+}
+.caja-login-logo { font-size: 44px; margin-bottom: 10px }
+.caja-login-title {
+  font-family: 'Playfair Display', serif; font-size: 26px;
+  font-weight: 700; color: var(--rose); margin-bottom: 4px;
+}
+.caja-login-sub { font-size: 13px; color: var(--ink3); margin-bottom: 24px; font-weight: 600 }
+
+.caja-role-tabs {
+  display: flex; gap: 4px; background: rgba(214,53,96,.08);
+  padding: 4px; border-radius: 999px; margin-bottom: 20px;
+}
+.crtab {
+  flex: 1; padding: 8px 14px; border-radius: 999px; border: none;
+  font-size: 13px; font-weight: 700; color: var(--ink3);
+  transition: all .2s; cursor: pointer; background: transparent;
+}
+.crtab--active { background: var(--rose); color: white; box-shadow: 0 4px 12px rgba(214,53,96,.3) }
+
+.caja-pin-label { font-size: 13px; font-weight: 700; color: var(--ink3); margin-bottom: 10px }
+.caja-pin-display {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; letter-spacing: 10px; color: var(--rose);
+  padding: 12px 20px; border-radius: var(--r-md);
+  background: var(--rose-bg); border: 2px solid var(--line);
+  min-height: 58px; margin-bottom: 10px;
+}
+.caja-pin-error {
+  font-size: 13px; font-weight: 700; color: var(--rose-dk);
+  background: var(--rose-lt); padding: 8px 14px;
+  border-radius: 10px; margin-bottom: 12px;
+}
+.caja-pin-pad {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 16px;
+}
+.cpkey {
+  padding: 14px; border-radius: var(--r-md);
+  border: 1.5px solid var(--line); background: var(--bg);
+  font-size: 20px; font-weight: 800; color: var(--ink);
+  transition: all .15s; cursor: pointer; user-select: none;
+}
+.cpkey:hover  { background: var(--rose-lt); border-color: var(--rose) }
+.cpkey:active { transform: scale(.92) }
+.cpkey--del { font-size: 16px; color: var(--ink3) }
+.cpkey--ok  { background: var(--rose); color: white; border-color: var(--rose); font-size: 16px }
+.cpkey--ok:hover { background: var(--rose-dk) }
+
+/* App header caja */
+.caja-app-header {
+  background: white; border-bottom: 1px solid var(--line);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  position: sticky; top: 62px; z-index: 50;
+}
+.caja-app-header--admin { border-bottom-color: rgba(214,53,96,.25) }
+.caja-app-header__left { display: flex; align-items: center; gap: 10px; font-size: 22px }
+.caja-app-header__title { font-weight: 800; font-size: 14px }
+.caja-app-header__date { font-size: 12px; color: var(--ink3); font-weight: 600 }
+
+/* Nav btn adicionales */
+.nav-btn--primary {
+  background: var(--rose); color: white; border-color: var(--rose);
+  box-shadow: 0 4px 14px rgba(214,53,96,.3);
+}
+.nav-btn--primary:hover { background: var(--rose-dk); transform: translateY(-1px) }
+.nav-btn--danger {
+  background: #dc2626; color: white; border-color: #dc2626;
+  box-shadow: 0 4px 14px rgba(220,38,38,.25);
+}
+.nav-btn--danger:hover { filter: brightness(.92) }
+.nav-btn--block { width: 100%; justify-content: center }
+
+/* Split layout */
+.caja-split {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  min-height: calc(100dvh - 130px);
+}
+
+/* Orden */
+.caja-order {
+  background: white; border-right: 1px solid var(--line);
+  padding: 18px; display: flex; flex-direction: column; gap: 12px;
+  position: sticky; top: 130px; height: calc(100dvh - 130px); overflow-y: auto;
+}
+.caja-order__head {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.caja-order__head h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700 }
+.caja-folio {
+  font-size: 12px; font-weight: 700; padding: 4px 10px;
+  background: var(--rose-lt); color: var(--rose-dk); border-radius: 999px;
+}
+.caja-order-items { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 60px }
+.caja-order-empty { color: var(--ink4); font-size: 13px; font-weight: 600; padding: 16px 0; text-align: center }
+
+.caja-order-item {
+  background: var(--bg); border: 1.5px solid var(--line);
+  border-radius: var(--r-md); padding: 10px 12px;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.caja-order-item__info { flex: 1; min-width: 0 }
+.caja-order-item__name { font-weight: 700; font-size: 13px }
+.caja-order-item__extras { font-size: 11px; color: var(--ink3); margin-top: 2px }
+.caja-order-item__qty { font-size: 11px; color: var(--ink4); margin-top: 1px }
+.caja-order-item__price {
+  font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px;
+  color: var(--rose); white-space: nowrap; flex-shrink: 0;
+}
+.caja-order-item__del {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--rose-lt); color: var(--rose-dk);
+  font-size: 13px; display: grid; place-items: center;
+  cursor: pointer; flex-shrink: 0; border: none;
+  transition: all .15s;
+}
+.caja-order-item__del:hover { background: var(--rose); color: white }
+
+.caja-order-total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-top: 2px solid var(--line); border-bottom: 1px solid var(--line);
+  font-weight: 700;
+}
+.caja-order-total strong {
+  font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--rose);
+}
+.caja-notes-input {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid var(--line); border-radius: var(--r-md);
+  font-size: 13px; outline: none; font-family: inherit;
+}
+.caja-notes-input:focus { border-color: var(--rose) }
+.caja-order-btns { display: flex; gap: 8px }
+
+/* Productos */
+.caja-products { padding: 18px; overflow-y: auto }
+.caja-products__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 12px;
+}
+.caja-products__head h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700 }
+.caja-mini-search {
+  padding: 7px 12px; border: 1.5px solid var(--line);
+  border-radius: 999px; font-size: 13px; outline: none; width: 160px;
+  font-family: inherit;
+}
+.caja-mini-search:focus { border-color: var(--rose) }
+
+.caja-cat-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px }
+.caja-cat-pill {
+  padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--line); background: white; color: var(--ink3);
+  cursor: pointer; transition: all .15s;
+}
+.caja-cat-pill--active { background: var(--rose); color: white; border-color: var(--rose) }
+
+.caja-prod-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(170px,1fr));
+}
+.caja-prod-btn {
+  background: white; border: 1.5px solid var(--line);
+  border-radius: var(--r-md); padding: 12px; text-align: left;
+  cursor: pointer; transition: all .18s;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.caja-prod-btn:hover { border-color: var(--rose); box-shadow: var(--sh-md); transform: translateY(-2px) }
+.caja-prod-btn__cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--ink4) }
+.caja-prod-btn__name { font-weight: 800; font-size: 13px; line-height: 1.2 }
+.caja-prod-btn__desc { font-size: 11px; color: var(--ink3); line-height: 1.3 }
+.caja-prod-btn__price { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--rose); margin-top: 4px }
+
+/* Admin tabs */
+.caja-admin-tabs {
+  display: flex; background: white; border-bottom: 2px solid var(--line); padding: 0 20px;
+  position: sticky; top: 112px; z-index: 40;
+}
+.catab {
+  padding: 12px 18px; font-size: 13px; font-weight: 700;
+  color: var(--ink3); border-bottom: 3px solid transparent;
+  margin-bottom: -2px; transition: all .2s; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none;
+}
+.catab--active { color: var(--rose); border-bottom-color: var(--rose) }
+.cadmin-view { display: none }
+.cadmin-view--active { display: block }
+
+/* Gasto form */
+.caja-form-wrap { max-width: 600px; margin: 28px auto; padding: 0 20px }
+.caja-form-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 20px }
+.caja-fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px }
+.caja-frow { display: flex; flex-direction: column; gap: 5px }
+.caja-frow label { font-size: 13px; font-weight: 700; color: var(--ink2) }
+.caja-frow input, .caja-frow select {
+  padding: 10px 12px; border: 1.5px solid var(--line);
+  border-radius: var(--r-md); font-size: 13px; font-family: inherit; outline: none; background: var(--bg);
+}
+.caja-frow input:focus, .caja-frow select:focus { border-color: var(--rose); background: white }
+.caja-frow--full { grid-column: 1/-1 }
+
+/* Corte */
+.caja-corte-wrap { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px }
+.caja-corte-hd {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+.caja-corte-hd h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700 }
+
+.caja-kpi-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 20px }
+.caja-kpi {
+  background: white; border-radius: var(--r-lg); padding: 16px 18px;
+  border: 1.5px solid var(--line); box-shadow: var(--sh-sm);
+}
+.caja-kpi--green { border-top: 3px solid #16a34a }
+.caja-kpi--amber { border-top: 3px solid #d97706 }
+.caja-kpi--rose  { border-top: 3px solid var(--rose) }
+.caja-kpi--blue  { border-top: 3px solid #2563eb }
+.caja-kpi__label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--ink4); margin-bottom: 6px }
+.caja-kpi__value { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1 }
+.caja-kpi--green .caja-kpi__value { color: #16a34a }
+.caja-kpi--amber .caja-kpi__value { color: #d97706 }
+.caja-kpi--rose  .caja-kpi__value { color: var(--rose) }
+.caja-kpi--blue  .caja-kpi__value { color: #2563eb }
+.caja-kpi__sub { font-size: 12px; color: var(--ink4); margin-top: 4px; font-weight: 600 }
+
+.caja-corte-section {
+  background: white; border-radius: var(--r-lg); padding: 18px; margin-bottom: 14px; box-shadow: var(--sh-sm);
+}
+.caja-corte-section h4 { font-size: 14px; font-weight: 800; margin-bottom: 12px }
+.caja-empty-msg { font-size: 13px; color: var(--ink4); font-weight: 600 }
+
+.caja-rank-list { display: flex; flex-direction: column; gap: 7px }
+.caja-rank-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--r-md);
+  background: var(--bg); border: 1px solid var(--line); font-size: 13px;
+}
+.caja-rank-pos { font-family: 'Playfair Display', serif; font-size: 16px; width: 26px; text-align: center }
+.caja-rank-name { flex: 1; font-weight: 700 }
+.caja-rank-qty { color: var(--ink3) }
+.caja-rank-total { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--rose) }
+
+.caja-txn-list { display: flex; flex-direction: column; gap: 5px }
+.caja-txn-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--r-md);
+  background: var(--bg); font-size: 12px;
+}
+.caja-txn-time { color: var(--ink4); font-weight: 600; flex-shrink: 0; width: 44px }
+.caja-txn-name { flex: 1; font-weight: 700 }
+.caja-txn-extras { color: var(--ink3); font-size: 11px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.caja-txn-amount { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--rose); flex-shrink: 0 }
+.caja-txn-enc { font-size: 11px; color: var(--ink4); flex-shrink: 0 }
+
+/* Modal */
+.caja-modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(15,10,13,.5); backdrop-filter: blur(6px);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.caja-modal-card {
+  background: white; border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 22px; width: 100%; max-width: 500px;
+  max-height: 90dvh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 16px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.15);
+}
+.caja-modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px }
+.caja-modal-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700 }
+.caja-modal-base { font-size: 13px; color: var(--ink3); font-weight: 600; margin-top: 2px }
+.caja-modal-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--bg); font-size: 13px; font-weight: 700;
+  display: grid; place-items: center; cursor: pointer;
+  border: none; transition: background .15s;
+}
+.caja-modal-close:hover { background: var(--rose-lt) }
+.caja-modal-section { display: flex; flex-direction: column; gap: 8px }
+.caja-modal-label { font-size: 13px; font-weight: 700; color: var(--ink2) }
+
+.caja-qty-ctrl { display: flex; align-items: center; gap: 12px }
+.caja-qty-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid var(--line); background: white;
+  font-size: 18px; font-weight: 700; display: grid; place-items: center; cursor: pointer;
+  transition: all .15s;
+}
+.caja-qty-btn:hover { border-color: var(--rose); background: var(--rose-lt) }
+#modalQty { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; min-width: 36px; text-align: center }
+
+.caja-extras-grid { display: flex; flex-wrap: wrap; gap: 7px }
+.caja-extra-btn {
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--line); background: white; color: var(--ink2);
+  cursor: pointer; transition: all .15s;
+}
+.caja-extra-btn:hover { border-color: var(--rose) }
+.caja-extra-btn--on { background: var(--rose); color: white; border-color: var(--rose) }
+
+.caja-price-wrap {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border: 2px solid var(--line);
+  border-radius: var(--r-md); background: var(--bg);
+  transition: border-color .18s;
+}
+.caja-price-wrap:focus-within { border-color: var(--rose); background: white }
+.caja-price-wrap span { color: var(--rose); font-size: 16px; font-weight: 800 }
+.caja-price-wrap input { border: none; background: none; outline: none; font-size: 18px; font-weight: 700; width: 100%; font-family: inherit }
+.caja-modal-hint { font-size: 11px; color: var(--ink4) }
+.caja-modal-summary {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 14px; background: var(--rose-lt); border-radius: var(--r-md);
+}
+.caja-modal-summary strong { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--rose) }
+
+/* Toast */
+.caja-toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: white;
+  padding: 11px 22px; border-radius: 999px;
+  font-size: 13px; font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 1000;
+  animation: toastIn .3s ease;
+}
+.caja-toast--success { background: #16a34a }
+.caja-toast--error   { background: #dc2626 }
+@keyframes toastIn { from { opacity:0;transform:translateX(-50%) translateY(10px) } to { opacity:1;transform:translateX(-50%) translateY(0) } }
+
+/* Spinner inline */
+.caja-spinner {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: white;
+  animation: spin .7s linear infinite; display: inline-block;
+}
+
+/* Responsive caja */
+@media (max-width: 780px) {
+  .caja-split { grid-template-columns: 1fr; }
+  .caja-order { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line) }
+  .caja-kpi-grid { grid-template-columns: 1fr 1fr }
+  .caja-fgrid { grid-template-columns: 1fr }
+  .caja-prod-grid { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)) }
+  .caja-admin-tabs { top: 110px }
+}
