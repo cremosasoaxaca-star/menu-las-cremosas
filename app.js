@@ -66,17 +66,11 @@ function strip(s) {
     .replace(/[úùü]/g,"u").trim();
 }
 
-/* ── CSV FETCH (CORS-safe) ──────────────────
-   Google Sheets public CSV puede fallar con CORS
-   en algunos entornos. Usamos dos estrategias:
-   1. fetch directo
-   2. si falla, proxy público
-─────────────────────────────────────────── */
+/* ── CSV FETCH (CORS-safe) ────────────────── */
 async function fetchText(url) {
   try {
     const r = await fetch(url, {
-      cache: "no-store",
-      mode: "cors",
+      cache: "no-store", mode: "cors",
       headers: { "Cache-Control": "no-cache" }
     });
     if (r.ok) return await r.text();
@@ -84,7 +78,6 @@ async function fetchText(url) {
   } catch(e1) {
     console.warn("Fetch directo falló:", e1.message, "— intentando proxy…");
   }
-
   try {
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     const r = await fetch(proxyUrl, { cache: "no-store" });
@@ -93,22 +86,18 @@ async function fetchText(url) {
     if (!json.contents) throw new Error("Proxy sin contenido");
     return json.contents;
   } catch(e2) {
-    throw new Error(`No se pudo cargar el CSV.\n\nDirecto: intento 1 falló.\nProxy: ${e2.message}\n\nVerifica que la hoja esté publicada como CSV en Google Sheets.`);
+    throw new Error(`No se pudo cargar el CSV.\nProxy: ${e2.message}\n\nVerifica que la hoja esté publicada como CSV.`);
   }
 }
 
 function parseCSV(text) {
   if (text.trim().startsWith("<!DOCTYPE") || text.trim().startsWith("<html")) {
-    throw new Error("La hoja de Google Sheets NO está publicada como CSV. Ve a Archivo → Compartir → Publicar en la web → elige la hoja → CSV.");
+    throw new Error("La hoja NO está publicada como CSV. Ve a Archivo → Compartir → Publicar en la web → elige la hoja → CSV.");
   }
-
   const rows=[]; let cur="",inQ=false,row=[];
   for (let i=0;i<text.length;i++) {
     const c=text[i],nx=text[i+1];
-    if (c==='"') {
-      if(inQ&&nx==='"'){cur+='"';i++;}
-      else inQ=!inQ;
-    }
+    if (c==='"') { if(inQ&&nx==='"'){cur+='"';i++;}else inQ=!inQ; }
     else if (c===','&&!inQ) { row.push(cur);cur=""; }
     else if ((c==='\n'||c==='\r')&&!inQ) {
       if(c==='\r'&&nx==='\n')i++;
@@ -117,10 +106,8 @@ function parseCSV(text) {
   }
   if(cur.length||row.length){row.push(cur);rows.push(row);}
   if(!rows.length) return [];
-
   const hdr = rows[0].map(h=>h.trim());
   console.log("📋 Columnas CSV:", hdr);
-
   const data=[];
   for(let r=1;r<rows.length;r++){
     const cols=rows[r];
@@ -185,10 +172,10 @@ function getSec(cat) {
 
   if (s === "frappes" || s === "frappe" || s.includes("frappe")) return "frappes";
   if (s === "waffles" || s === "waffle" || s.includes("waffle")) return "waffles";
-  if (s === "snacks" || s === "snack" || s.includes("snack")) return "snacks";
-  if (s === "bebidas" || s === "bebida" || s.includes("bebida")) return "bebidas";
+  if (s === "snacks"  || s === "snack"  || s.includes("snack"))  return "snacks";
+  if (s === "bebidas" || s === "bebida" || s.includes("bebida"))  return "bebidas";
 
-  console.warn("⚠ Categoria sin sección (valor exacto):", JSON.stringify(cat), "→ normalizado:", JSON.stringify(s));
+  console.warn("⚠ Categoria sin sección:", JSON.stringify(cat), "→", JSON.stringify(s));
   return null;
 }
 
@@ -201,7 +188,6 @@ function clearSections() {
 
 function renderAll() {
   clearSections();
-
   const q   = S.q.trim().toLowerCase();
   const cat = S.cat;
   let count = 0;
@@ -209,47 +195,38 @@ function renderAll() {
   for (const it of S.items) {
     if (S.avail && !bool(it.Disponible, true)) continue;
     if (cat && it.Categoria !== cat) continue;
-
     if (q) {
       const hay = [it.Nombre, it.Variante, it.Descripcion, it.Categoria, it.Badges, it.Notas]
-        .map(x => String(x || "").toLowerCase())
-        .join(" ");
+        .map(x => String(x || "").toLowerCase()).join(" ");
       if (!hay.includes(q)) continue;
     }
-
     const sec = getSec(it.Categoria);
     const avail = bool(it.Disponible, true);
-
-    if (sec === "fresas") {
-      renderSizeCard(it, avail);
-    } else if (sec) {
-      renderProdCard(it, avail, sec);
-    }
-
+    if (sec === "fresas") renderSizeCard(it, avail);
+    else if (sec)         renderProdCard(it, avail, sec);
     count++;
   }
 
-  // 🔥 ESTA ES LA LÍNEA CLAVE QUE TE FALTABA
   renderExtras();
 
   [
-    { id: "sec-fresas", grid: "#sizes-fresas" },
-    { id: "sec-especiales", grid: "#grid-especiales" },
-    { id: "sec-frappes", grid: "#grid-frappes" },
-    { id: "sec-waffles", grid: "#grid-waffles" },
-    { id: "sec-snacks", grid: "#grid-snacks" },
-    { id: "sec-bebidas", grid: "#grid-bebidas" },
+    { id:"sec-fresas",     grid:"#sizes-fresas" },
+    { id:"sec-especiales", grid:"#grid-especiales" },
+    { id:"sec-frappes",    grid:"#grid-frappes" },
+    { id:"sec-waffles",    grid:"#grid-waffles" },
+    { id:"sec-snacks",     grid:"#grid-snacks" },
+    { id:"sec-bebidas",    grid:"#grid-bebidas" },
   ].forEach(({ id, grid }) => {
     const secEl = document.querySelector(`#${id}`);
-    const gEl = document.querySelector(grid);
+    const gEl   = document.querySelector(grid);
     if (secEl) secEl.style.display = (gEl && gEl.children.length > 0) ? "" : "none";
   });
 
   document.querySelector("#emptyState")?.classList.toggle("hidden", count > 0);
-
   const ic = document.querySelector("#itemsCount");
   if (ic) ic.textContent = `${count} productos`;
 }
+
 function renderSizeCard(it, avail) {
   const grid=$("#sizes-fresas"); if(!grid)return;
   const p = num(it.Precio);
@@ -312,8 +289,7 @@ function renderExtras() {
     } else if (tipo==="base extra"||tipo==="base"||tipo==="jarabe") {
       $(`#${ids.bases}`)?.appendChild(chip);
     } else if (tipo==="chocolate extra"||tipo==="chocolate") {
-      const target = (tp.includes("fijo")||tp.includes("costo extra"))
-        ? ids.fijo : ids.var;
+      const target = (tp.includes("fijo")||tp.includes("costo extra")) ? ids.fijo : ids.var;
       $(`#${target}`)?.appendChild(chip);
     }
   }
@@ -325,289 +301,47 @@ function buildCatSelect() {
   sel.innerHTML=`<option value="">Todas las categorías</option>`;
   cats.forEach(c=>{
     const o=document.createElement("option");
-    o.value=c;
-    o.textContent=c;
-    sel.appendChild(o);
+    o.value=c; o.textContent=c; sel.appendChild(o);
   });
-}
-
-function buildSaleSelect() {
-  const sel=$("#saleProduct"); if(!sel)return;
-  sel.innerHTML=`<option value="">Selecciona producto…</option>`;
-  S.items
-    .filter(it=>bool(it.Disponible,true))
-    .sort((a,b)=>{
-      const na=[a.Nombre,a.Variante].filter(Boolean).join(" ");
-      const nb=[b.Nombre,b.Variante].filter(Boolean).join(" ");
-      return na.localeCompare(nb,"es");
-    })
-    .forEach(it=>{
-      const label=[it.Nombre,it.Variante].filter(Boolean).join(" — ");
-      const p=num(it.Precio);
-      const o=document.createElement("option");
-      o.value=label;
-      o.textContent=`${label}  ·  ${fmt(p)}`;
-      o.dataset.price=p;
-      sel.appendChild(o);
-    });
 }
 
 function setMeta(msg = null) {
   const lu=$("#lastUpdated");
-  if(lu) {
-    lu.textContent = msg || `${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · actualizado`;
-  }
+  if(lu) lu.textContent = msg || `${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · actualizado`;
   const ic=$("#itemsCount");
   if(ic) ic.textContent=`${S.items.length} productos`;
 }
 
-/* ── Auto reload del menú ───────────────── */
+/* ── Auto reload ────────────────────────── */
 async function reloadMenuIfChanged() {
   const { itemsCsvUrl, extrasCsvUrl } = CFG.sheets || {};
   if (!itemsCsvUrl || !extrasCsvUrl) return;
-
   try {
-    const [rawItems, rawExtras] = await Promise.all([
-      csv(itemsCsvUrl),
-      csv(extrasCsvUrl),
-    ]);
-
-    const nextSnapshot = JSON.stringify({
-      items: rawItems,
-      extras: rawExtras,
-    });
-
+    const [rawItems, rawExtras] = await Promise.all([csv(itemsCsvUrl), csv(extrasCsvUrl)]);
+    const nextSnapshot = JSON.stringify({ items: rawItems, extras: rawExtras });
     if (nextSnapshot === MENU_SNAPSHOT) return;
-
     MENU_SNAPSHOT = nextSnapshot;
-
-    S.items = rawItems.map(normalizeItem);
+    S.items  = rawItems.map(normalizeItem);
     S.extras = rawExtras.map(normalizeExtra);
-
     buildCatSelect();
     renderExtras();
-    buildSaleSelect();
-    setMeta(`${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · menú actualizado automáticamente`);
+    setMeta(`${new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"})} · actualizado`);
     renderAll();
-
-    console.log("🔄 Menú actualizado automáticamente desde Google Sheets");
+    // Actualizar datos en caja.js
+    window._cajaItems  = S.items;
+    window._cajaExtras = S.extras;
+    if (window._setCajaData) window._setCajaData(S.items, S.extras);
+    console.log("🔄 Menú actualizado automáticamente");
   } catch (err) {
-    console.error("❌ Error al actualizar menú automáticamente:", err);
-  }
-}
-
-/* ── PIN ────────────────────────────────── */
-const PIN   = String(CFG.cajaPin || "1234");
-const SESS  = "cremosas_ok";
-let   pinBuf= "";
-
-const cajaOk   = () => sessionStorage.getItem(SESS)==="ok";
-const showPin  = () => {
-  pinBuf=""; updPin();
-  $("#pinError")?.classList.add("hidden");
-  $("#cajaLocked")?.classList.remove("hidden");
-  $("#cajaContent")?.classList.add("hidden");
-};
-const showCaja = () => {
-  $("#cajaLocked")?.classList.add("hidden");
-  $("#cajaContent")?.classList.remove("hidden");
-};
-const lockCaja = () => { sessionStorage.removeItem(SESS); goTab("menu"); };
-
-function pinPress(v){ if(pinBuf.length<8){pinBuf+=v;updPin();} }
-function pinDel()   { pinBuf=pinBuf.slice(0,-1);updPin(); }
-function updPin()   { const el=$("#pinDisplay");if(el)el.textContent=pinBuf.length?"●".repeat(pinBuf.length):"· · · ·"; }
-function pinOk() {
-  if(pinBuf===PIN){
-    sessionStorage.setItem(SESS,"ok");
-    showCaja(); loadFinancials(); pinBuf="";
-  } else {
-    pinBuf=""; updPin();
-    $("#pinError")?.classList.remove("hidden");
-    const d=$("#pinDisplay");
-    d?.classList.add("shake");
-    setTimeout(()=>d?.classList.remove("shake"),500);
+    console.error("Error al auto-actualizar:", err);
   }
 }
 
 /* ── Tab switch ─────────────────────────── */
 function goTab(t) {
-  $$(".ntab").forEach(b=>b.classList.toggle("ntab--active",b.dataset.tab===t));
-  $$(".tview").forEach(v=>v.classList.toggle("tview--active",v.id===`tab${t[0].toUpperCase()+t.slice(1)}`));
-  if(t==="caja") cajaOk()?(showCaja(),loadFinancials()):showPin();
-}
-
-/* ── Financials ─────────────────────────── */
-function buildSummary() {
-  const td=today();
-  const ts=S.sales.filter(s=>normDate(s.fecha)===td);
-  const te=S.expenses.filter(e=>normDate(e.fecha)===td);
-  const totalS=ts.reduce((a,s)=>a+num(s.total),0);
-  const totalE=te.reduce((a,e)=>a+num(e.monto),0);
-  const profit=totalS-totalE;
-  const set=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
-  set("#salesTodayTotal",    fmt(totalS));
-  set("#expensesTodayTotal", fmt(totalE));
-  set("#profitTodayTotal",   fmt(profit));
-  set("#salesCountToday",    `${ts.length} venta${ts.length!==1?"s":""}`);
-  const pe=$("#profitTodayTotal");
-  if(pe)pe.style.color=profit>=0?"#16a34a":"var(--rose)";
-
-  const grouped={};
-  ts.forEach(s=>{const n=s.producto||"?";grouped[n]=(grouped[n]||0)+num(s.cantidad);});
-  const cont=$("#topProductsToday");if(!cont)return;
-  cont.innerHTML="";
-  const sorted=Object.entries(grouped).sort((a,b)=>b[1]-a[1]);
-  if(!sorted.length){cont.innerHTML=`<p class="prod-list__empty">Sin ventas hoy.</p>`;return;}
-  sorted.forEach(([name,qty],i)=>{
-    const row=document.createElement("div");
-    row.className="prod-row";
-    const medal=["🥇","🥈","🥉"][i]||`${i+1}.`;
-    row.innerHTML=`<span>${medal} ${name}</span><strong>${qty}</strong>`;
-    cont.appendChild(row);
-  });
-}
-
-async function loadFinancials() {
-  const {ventasCsvUrl,gastosCsvUrl}=CFG.sheets||{};
-  if(!ventasCsvUrl||!gastosCsvUrl){buildSummary();return;}
-  try {
-    const [s,e]=await Promise.all([csv(ventasCsvUrl),csv(gastosCsvUrl)]);
-    S.sales=s.map(r=>({
-      fecha:r.fecha||r.Fecha||"",
-      producto:r.producto||r.Producto||"",
-      cantidad:r.cantidad||r.Cantidad||"0",
-      total:r.total||r.Total||"0",
-      encargado:r.encargado||r.Encargado||"",
-      notas:r.notas||r.Notas||"",
-    }));
-    S.expenses=e.map(r=>({
-      fecha:r.fecha||r.Fecha||"",
-      concepto:r.concepto||r.Concepto||"",
-      categoria:r.categoria||r.Categoria||"",
-      monto:r.monto||r.Monto||"0",
-      encargado:r.encargado||r.Encargado||"",
-      notas:r.notas||r.Notas||"",
-    }));
-    buildSummary();
-  } catch(err){
-    console.error("Error financials:",err);
-    showMsg("No pude cargar ventas/gastos: " + err.message,"error");
-  }
-}
-
-/* ── API save ───────────────────────────── */
-async function apiPost(payload) {
-  const url = CFG.api?.saveUrl || "";
-  if (!url || url.includes("PEGA")) {
-    throw new Error("Configura la URL del Apps Script en config.js");
-  }
-
-  try {
-    const form = new FormData();
-    form.append("payload", JSON.stringify(payload));
-    await fetch(url, { method:"POST", body: form, mode:"no-cors" });
-    return { ok: true };
-  } catch(err) {
-    throw new Error("Error de red al guardar: " + err.message);
-  }
-}
-
-function showMsg(txt,type="success"){
-  const el=$("#adminMessage");if(!el)return;
-  el.textContent=txt;
-  el.className=`status-msg status-msg--${type}`;
-  el.classList.remove("hidden");
-  clearTimeout(el._t);
-  el._t=setTimeout(()=>el.classList.add("hidden"),5000);
-}
-
-function previewTotal(){
-  const q=num($("#saleQty")?.value),p=num($("#salePrice")?.value);
-  const el=$("#saleTotalPreview");if(!el)return;
-  el.textContent=(q>0&&p>=0)?fmt(q*p):"—";
-}
-
-const ICON_SAVE=`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`;
-
-async function saveSale(){
-  const producto=$("#saleProduct")?.value.trim();
-  const cantidad=num($("#saleQty")?.value);
-  const precio=num($("#salePrice")?.value);
-  const encargado=$("#saleManager")?.value.trim();
-  const notas=$("#saleNotes")?.value.trim();
-
-  if(!producto||cantidad<=0||precio<0){
-    showMsg("Completa todos los datos.","error");
-    return;
-  }
-
-  const btn=$("#btnSaveSale");
-  if(!btn)return;
-
-  btn.disabled=true;
-  btn.innerHTML=`<span class="spinner"></span> Guardando…`;
-
-  try{
-    await apiPost({
-      action:"saveSale",
-      data:{
-        producto,
-        cantidad,
-        precio_unitario:precio,
-        total:cantidad*precio,
-        encargado,
-        notas
-      }
-    });
-    showMsg("✅ Venta guardada.");
-    ["saleManager","saleNotes","salePrice"].forEach(id=>{const e=$(`#${id}`);if(e)e.value="";});
-    const sp=$("#saleProduct");if(sp)sp.selectedIndex=0;
-    const sq=$("#saleQty");if(sq)sq.value="1";
-    const st=$("#saleTotalPreview");if(st)st.textContent="—";
-    await loadFinancials();
-  }catch(err){
-    showMsg(err.message||"Error.","error");
-  } finally{
-    btn.disabled=false;
-    btn.innerHTML=ICON_SAVE+" Guardar venta";
-  }
-}
-
-async function saveExpense(){
-  const concepto=$("#expenseConcept")?.value.trim();
-  const catRaw=$("#expenseCategory")?.value.trim();
-  const categoria=catRaw.replace(/^[^\s]+\s/,"");
-  const monto=num($("#expenseAmount")?.value);
-  const encargado=$("#expenseManager")?.value.trim();
-  const notas=$("#expenseNotes")?.value.trim();
-
-  if(!concepto||!catRaw||monto<=0){
-    showMsg("Completa todos los datos.","error");
-    return;
-  }
-
-  const btn=$("#btnSaveExpense");
-  if(!btn)return;
-
-  btn.disabled=true;
-  btn.innerHTML=`<span class="spinner"></span> Guardando…`;
-
-  try{
-    await apiPost({
-      action:"saveExpense",
-      data:{concepto,categoria,monto,encargado,notas}
-    });
-    showMsg("✅ Gasto guardado.");
-    ["expenseConcept","expenseAmount","expenseManager","expenseNotes"].forEach(id=>{const e=$(`#${id}`);if(e)e.value="";});
-    const ec=$("#expenseCategory");if(ec)ec.selectedIndex=0;
-    await loadFinancials();
-  }catch(err){
-    showMsg(err.message||"Error.","error");
-  } finally{
-    btn.disabled=false;
-    btn.innerHTML=ICON_SAVE+" Guardar gasto";
-  }
+  $$(".ntab").forEach(b=>b.classList.toggle("ntab--active", b.dataset.tab===t));
+  $$(".tview").forEach(v=>v.classList.toggle("tview--active", v.id===`tab${t[0].toUpperCase()+t.slice(1)}`));
+  // La caja la maneja caja.js — no necesita lógica aquí
 }
 
 /* ── Setup UI ───────────────────────────── */
@@ -616,37 +350,9 @@ function setupUI(){
   const waLink=`https://wa.me/${CFG.whatsappPhoneE164||""}?text=${waMsg}`;
   ["#btnWhats","#ctaWhats","#heroWhats"].forEach(id=>{const e=$(id);if(e)e.href=waLink;});
 
-  const yn=$("#yearNow");
-  if(yn)yn.textContent=new Date().getFullYear();
-
-  const cd=$("#cajaDate");
-  if(cd)cd.textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  const yn=$("#yearNow"); if(yn)yn.textContent=new Date().getFullYear();
 
   $$(".ntab").forEach(t=>t.addEventListener("click",()=>goTab(t.dataset.tab)));
-
-  $$(".pkey").forEach(k=>k.addEventListener("click",()=>{
-    const v=k.dataset.val;
-    if(v==="del")pinDel();
-    else if(v==="ok")pinOk();
-    else pinPress(v);
-  }));
-
-  document.addEventListener("keydown",e=>{
-    if($("#cajaLocked")?.classList.contains("hidden"))return;
-    if(e.key>="0"&&e.key<="9")pinPress(e.key);
-    else if(e.key==="Backspace")pinDel();
-    else if(e.key==="Enter")pinOk();
-  });
-
-  $("#btnLockCaja")?.addEventListener("click",lockCaja);
-
-  $$(".ctab").forEach(t=>t.addEventListener("click",()=>{
-    $$(".ctab").forEach(x=>x.classList.remove("ctab--active"));
-    t.classList.add("ctab--active");
-    const f=t.dataset.form;
-    $$(".cform").forEach(x=>x.classList.remove("cform--active"));
-    $(`#form${f[0].toUpperCase()+f.slice(1)}`)?.classList.add("cform--active");
-  }));
 
   $("#searchInput")?.addEventListener("input",e=>{S.q=e.target.value;renderAll();});
   $("#categorySelect")?.addEventListener("change",e=>{S.cat=e.target.value;renderAll();});
@@ -654,12 +360,8 @@ function setupUI(){
 
   $("#btnShare")?.addEventListener("click",async()=>{
     try{
-      if(navigator.share){
-        await navigator.share({title:"Las Cremosas 🍓",text:"Mira el menú",url:location.href});
-      } else {
-        await navigator.clipboard.writeText(location.href);
-        alert("¡Link copiado! ✅");
-      }
+      if(navigator.share) await navigator.share({title:"Las Cremosas 🍓",text:"Mira el menú",url:location.href});
+      else { await navigator.clipboard.writeText(location.href); alert("¡Link copiado! ✅"); }
     }catch{}
   });
 
@@ -667,18 +369,6 @@ function setupUI(){
   $("#openHow")?.addEventListener("click",e=>{e.preventDefault();dlg?.showModal();});
   $("#closeHow")?.addEventListener("click",()=>dlg?.close());
   dlg?.addEventListener("click",e=>{if(e.target===dlg)dlg.close();});
-
-  $("#saleProduct")?.addEventListener("change",e=>{
-    const o=e.target.selectedOptions[0];
-    const sp=$("#salePrice");
-    if(sp)sp.value=o?.dataset?.price??"";
-    previewTotal();
-  });
-
-  ["saleQty","salePrice"].forEach(id=>$(`#${id}`)?.addEventListener("input",previewTotal));
-  $("#btnSaveSale")?.addEventListener("click",saveSale);
-  $("#btnSaveExpense")?.addEventListener("click",saveExpense);
-  $("#refreshSummary")?.addEventListener("click",async()=>{await loadFinancials();showMsg("Corte actualizado.");});
 }
 
 /* ── MAIN ───────────────────────────────── */
@@ -696,62 +386,51 @@ async function main(){
   if(lu)lu.textContent="Cargando menú…";
 
   try{
-    const [rawItems,rawExtras]=await Promise.all([
-      csv(itemsCsvUrl),
-      csv(extrasCsvUrl),
-    ]);
+    const [rawItems,rawExtras]=await Promise.all([csv(itemsCsvUrl),csv(extrasCsvUrl)]);
 
-    MENU_SNAPSHOT = JSON.stringify({
-      items: rawItems,
-      extras: rawExtras,
-    });
+    MENU_SNAPSHOT = JSON.stringify({ items: rawItems, extras: rawExtras });
 
-    console.log(`✅ Items cargados: ${rawItems.length}, Extras: ${rawExtras.length}`);
+    console.log(`✅ Items: ${rawItems.length}, Extras: ${rawExtras.length}`);
     if(rawItems.length>0){
-      console.log("🔑 Columnas CSV:", Object.keys(rawItems[0]));
+      console.log("🔑 Columnas:", Object.keys(rawItems[0]));
       console.log("📄 Primer row:", rawItems[0]);
     }
 
     S.items  = rawItems.map(normalizeItem);
     S.extras = rawExtras.map(normalizeExtra);
 
-    const cats = [...new Set(S.items.map(i=>i.Categoria).filter(Boolean))];
+    const cats=[...new Set(S.items.map(i=>i.Categoria).filter(Boolean))];
     console.log("📂 Categorías:", cats);
-    console.log("📦 Mapeo:", cats.map(c => c + " → " + (getSec(c)||"❌ SIN SECCIÓN")));
+    console.log("📦 Mapeo:", cats.map(c=>c+" → "+(getSec(c)||"❌ SIN SECCIÓN")));
 
     buildCatSelect();
     renderExtras();
-    buildSaleSelect();
     setMeta();
     renderAll();
+
+    // ── Compartir datos con caja.js ──────────
+    window._cajaItems  = S.items;
+    window._cajaExtras = S.extras;
+    if (window._setCajaData) window._setCajaData(S.items, S.extras);
 
     if (MENU_RELOAD_TIMER) clearInterval(MENU_RELOAD_TIMER);
     MENU_RELOAD_TIMER = setInterval(reloadMenuIfChanged, MENU_REFRESH_MS);
 
   }catch(err){
-    console.error("❌ Error al cargar menú:", err);
-    if(lu)lu.textContent="⚠ Error al cargar datos";
-
+    console.error("❌ Error:", err);
+    const lu=$("#lastUpdated"); if(lu)lu.textContent="⚠ Error al cargar datos";
     const page=document.querySelector(".page-wrap");
     if(page){
-      const errBox=document.createElement("div");
-      errBox.style.cssText="margin:40px auto;max-width:600px;background:#fef2f2;border:2px solid #fca5a5;border-radius:16px;padding:28px;font-family:sans-serif;";
-      errBox.innerHTML=`
-        <h3 style="color:#dc2626;margin:0 0 12px;font-size:18px">⚠ No se pudo cargar el menú</h3>
-        <p style="color:#7f1d1d;margin:0 0 16px;font-size:14px;line-height:1.6">${err.message.replace(/\n/g,"<br>")}</p>
-        <p style="color:#991b1b;font-size:13px;font-weight:600;margin:0">
-          <strong>Solución:</strong><br>
-          1. Abre tu Google Sheet<br>
-          2. Ve a <em>Archivo → Compartir → Publicar en la web</em><br>
-          3. Selecciona la hoja <strong>DATA_ITEMS</strong><br>
-          4. Elige formato <strong>Valores separados por comas (.csv)</strong><br>
-          5. Haz clic en <strong>Publicar</strong><br>
-          6. Repite para <strong>DATA_EXTRAS</strong>
-        </p>
-      `;
-      page.prepend(errBox);
+      const box=document.createElement("div");
+      box.style.cssText="margin:40px auto;max-width:600px;background:#fef2f2;border:2px solid #fca5a5;border-radius:16px;padding:28px;font-family:sans-serif;";
+      box.innerHTML=`<h3 style="color:#dc2626;margin:0 0 12px">⚠ No se pudo cargar el menú</h3>
+        <p style="color:#7f1d1d;font-size:14px;line-height:1.6">${err.message.replace(/\n/g,"<br>")}</p>
+        <p style="color:#991b1b;font-size:13px;font-weight:600;margin-top:12px">
+          Solución: Abre tu Google Sheet → Archivo → Compartir → Publicar en la web → selecciona DATA_ITEMS → CSV → Publicar. Repite para DATA_EXTRAS.
+        </p>`;
+      page.prepend(box);
     }
   }
 }
 
-document.addEventListener("DOMContentLoaded",main);
+document.addEventListener("DOMContentLoaded", main);
