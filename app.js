@@ -136,12 +136,23 @@ const S = { items:[], extras:[], sales:[], expenses:[], q:"", cat:"", avail:true
    que pueda venir del sheet
 ─────────────────────────────────────────── */
 function normalizeItem(r) {
-  // Precio: puede venir con "$" del formato de Sheets → num() lo limpia
+  // Buscar la key de categoría de forma flexible (cualquier columna que empiece con "Cat")
+  const catKey = Object.keys(r).find(k => /^cat/i.test(k.trim())) || "Categoria";
+  const cat = r[catKey] || r.Categoria || r.Category || r.categoria || "";
+
+  // Buscar variante de forma flexible
+  const varKey = Object.keys(r).find(k => /variante|tama/i.test(k)) || "";
+  const variante = (varKey ? r[varKey] : "") || r["Variante/Tamaño"] || r.Variante || r.Tamaño || "";
+
+  // Buscar descripción flexible
+  const descKey = Object.keys(r).find(k => /descrip/i.test(k)) || "";
+  const desc = (descKey ? r[descKey] : "") || r.Descripcion || r.Description || "";
+
   return {
-    Categoria:   r.Categoria   || r.Category    || "",
+    Categoria:   cat,
     Nombre:      r.Producto    || r.Nombre       || r.Item   || "",
-    Variante:    r["Variante/Tamaño"] || r["Variante"] || r.Variante || r.Tamaño || "",
-    Descripcion: r["Descripción"] || r.Descripcion || r.Descripcion || r.Description || "",
+    Variante:    variante,
+    Descripcion: desc,
     Precio:      r.Precio      || r.PrecioMXN    || r.Price  || "",
     Disponible:  r.Activo      || r.Disponible   || "Sí",
     Badges:      r.Badges      || r.Etiquetas    || "",
@@ -161,31 +172,38 @@ function normalizeExtra(r) {
 }
 
 /* ── Category → section ID ─────────────── */
-// Mapa directo (nombre exacto del sheet) + fallback parcial
-const SEC_MAP = {
-  "fresas con crema":  "fresas",
-  "fresas especiales": "especiales",
-  "frappes":           "frappes",
-  "frappe":            "frappes",
-  "waffles":           "waffles",
-  "waffle":            "waffles",
-  "snacks":            "snacks",
-  "snack":             "snacks",
-  "bebidas":           "bebidas",
-  "bebida":            "bebidas",
-};
-
+// Ultra-robusto: limpia espacios, tildes, mayúsculas y compara
 function getSec(cat) {
-  const s = strip(cat);
-  if (SEC_MAP[s]) return SEC_MAP[s];
-  if (s.includes("fresas con crema"))         return "fresas";
-  if (s.includes("fresas especial"))          return "especiales";
-  if (s.includes("golosa"))                   return "especiales";
-  if (s.includes("frappe"))                   return "frappes";
-  if (s.includes("waffle"))                   return "waffles";
-  if (s.includes("snack"))                    return "snacks";
-  if (s.includes("bebida"))                   return "bebidas";
-  console.warn("Categoria sin sección:", cat);
+  // Limpia completamente: sin tildes, sin espacios dobles, lowercase, trim
+  const s = String(cat||"")
+    .toLowerCase()
+    .replace(/[áàâä]/g,"a").replace(/[éèêë]/g,"e")
+    .replace(/[íìîï]/g,"i").replace(/[óòôö]/g,"o")
+    .replace(/[úùûü]/g,"u").replace(/ñ/g,"n")
+    .replace(/\s+/g," ").trim();
+
+  // Fresas con crema — muchas variaciones posibles
+  if (s === "fresas con crema" || s === "fresa con crema" ||
+      s.startsWith("fresas con") || s.includes("con crema")) return "fresas";
+
+  // Fresas especiales / golosas
+  if (s === "fresas especiales" || s === "fresa especial" ||
+      s.includes("especial") || s.includes("golosa") ||
+      s.includes("chocolate")) return "especiales";
+
+  // Frappes
+  if (s === "frappes" || s === "frappe" || s.includes("frappe")) return "frappes";
+
+  // Waffles
+  if (s === "waffles" || s === "waffle" || s.includes("waffle")) return "waffles";
+
+  // Snacks
+  if (s === "snacks" || s === "snack" || s.includes("snack")) return "snacks";
+
+  // Bebidas
+  if (s === "bebidas" || s === "bebida" || s.includes("bebida")) return "bebidas";
+
+  console.warn("⚠ Categoria sin sección (valor exacto):", JSON.stringify(cat), "→ normalizado:", JSON.stringify(s));
   return null;
 }
 
@@ -594,15 +612,17 @@ async function main(){
     ]);
 
     console.log(`✅ Items cargados: ${rawItems.length}, Extras: ${rawExtras.length}`);
-    if(rawItems.length>0) console.log("Primer item:", rawItems[0]);
+    if(rawItems.length>0){
+      console.log("🔑 Columnas CSV:", Object.keys(rawItems[0]));
+      console.log("📄 Primer row:", rawItems[0]);
+    }
 
     S.items  = rawItems.map(normalizeItem);
     S.extras = rawExtras.map(normalizeExtra);
 
-    // Debug: muestra categorías únicas detectadas
-    const cats = [...new Set(S.items.map(i=>i.Categoria))];
-    console.log("📂 Categorías del sheet:", cats);
-    console.log("📦 Mapeo a secciones:", cats.map(c=>c+" → "+getSec(c)));
+    const cats = [...new Set(S.items.map(i=>i.Categoria).filter(Boolean))];
+    console.log("📂 Categorías:", cats);
+    console.log("📦 Mapeo:", cats.map(c => c + " → " + (getSec(c)||"❌ SIN SECCIÓN")));
 
     buildCatSelect();
     renderExtras();
