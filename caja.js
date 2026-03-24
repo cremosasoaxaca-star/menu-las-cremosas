@@ -173,14 +173,22 @@
 
   /* ══ ADMIN ═════════════════════════ */
   function startAdmin() {
-    $c("#adminDate").textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"});
+    if($c("#adminDate")) $c("#adminDate").textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"});
     CS.folio=genFolioC();
     if($c("#adminFolio")) $c("#adminFolio").textContent=CS.folio;
-    $c("#btnLogoutAdmin")?.addEventListener("click",logoutC);
-    $c("#adminBtnClear")?.addEventListener("click",()=>clearOrderC("admin"));
-    $c("#adminBtnSave")?.addEventListener("click",()=>saveOrderC("admin"));
-    $c("#btnSaveGasto")?.addEventListener("click",saveGastoC);
-    $c("#btnRefreshCorte")?.addEventListener("click",loadCorteC);
+
+    // Usar delegación de eventos en el documento para evitar problemas con elementos ocultos
+    document.addEventListener("click", function adminClickHandler(e) {
+      const id = e.target.closest("[id]")?.id || e.target.id;
+      if(e.target.id==="btnLogoutAdmin"||e.target.closest("#btnLogoutAdmin"))logoutC();
+      else if(e.target.id==="adminBtnClear"||e.target.closest("#adminBtnClear"))clearOrderC("admin");
+      else if(e.target.id==="adminBtnSave"||e.target.closest("#adminBtnSave"))saveOrderC("admin");
+      else if(e.target.id==="btnSaveGasto"||e.target.closest("#btnSaveGasto"))saveGastoC();
+      else if(e.target.id==="btnRefreshCorte"||e.target.closest("#btnRefreshCorte")){
+        console.log("🔄 Botón Actualizar presionado");
+        loadCorteC();
+      }
+    });
 
     // Admin tabs
     $$c(".catab").forEach(t=>{
@@ -190,13 +198,22 @@
         const v=t.dataset.view;
         $$c(".cadmin-view").forEach(x=>x.classList.remove("cadmin-view--active"));
         $c(`#cajaAdmin${v[0].toUpperCase()+v.slice(1)}`)?.classList.add("cadmin-view--active");
-        if(v==="corte") loadCorteC();
+        if(v==="corte"){
+          console.log("📊 Entrando al tab Corte — cargando datos...");
+          loadCorteC();
+        }
       });
     });
 
     buildCatPillsC("admin");
     buildProdGridC("admin","");
     $c("#adminSearch")?.addEventListener("input",e=>buildProdGridC("admin",e.target.value));
+
+    // Cargar corte automáticamente al entrar como admin
+    setTimeout(()=>{
+      console.log("📊 Carga inicial del corte...");
+      loadCorteC();
+    }, 500);
   }
 
   /* ══ PRODUCTOS UI ══════════════════ */
@@ -546,35 +563,52 @@
     if(btn){btn.disabled=true;btn.textContent="Cargando…";}
     try {
       const {ventasCsvUrl,gastosCsvUrl}=CFG.sheets||{};
-      if(!ventasCsvUrl||!gastosCsvUrl)throw new Error("Configura URLs de ventas/gastos en config.js");
+      if(!ventasCsvUrl||!gastosCsvUrl) throw new Error("Faltan URLs de ventas/gastos en config.js");
+
+      console.log("🔄 Cargando corte...");
+      console.log("📊 ventasCsvUrl:", ventasCsvUrl);
+      console.log("📊 gastosCsvUrl:", gastosCsvUrl);
+
       const [sales,expenses]=await Promise.all([fetchCSVC(ventasCsvUrl),fetchCSVC(gastosCsvUrl)]);
 
+      console.log(`✅ Ventas cargadas: ${sales.length} filas`);
+      console.log(`✅ Gastos cargados: ${expenses.length} filas`);
+      if(sales.length>0) console.log("📋 Columnas ventas:", Object.keys(sales[0]));
+      if(expenses.length>0) console.log("📋 Columnas gastos:", Object.keys(expenses[0]));
+      if(sales.length>0) console.log("📄 Primera venta:", sales[0]);
+
       CS.sales=sales.map(r=>({
-        // Columnas reales del sheet: fecha, hora, producto, cantidad, precio_unitario, total, encargado, notas
         fecha:    r.fecha     || r.Fecha     || "",
         hora:     r.hora      || r.Hora      || "",
         producto: r.producto  || r.Producto  || "",
         cantidad: numC(r.cantidad || r.Cantidad || 1),
         precio:   numC(r.precio_unitario || r.precio || r.Precio || 0),
-        extras:   r.extras    || r.notas     || "",
-        subtotal: numC(r.total || r.Total || r.subtotal || 0), // tu sheet usa "total" como subtotal por fila
+        extras:   r.extras    || "",
         total:    numC(r.total || r.Total || 0),
         encargado:r.encargado || r.Encargado || "",
         notas:    r.notas     || r.Notas     || "",
         folio:    r.folio     || r.Folio     || "",
       }));
+
       CS.expenses=expenses.map(r=>({
-        fecha:r.fecha||r.Fecha||"",
-        hora:r.hora||r.Hora||"",
-        concepto:r.concepto||r.Concepto||"",
-        categoria:r.categoria||r.Categoria||"",
-        monto:numC(r.monto||r.Monto||0),
-        encargado:r.encargado||r.Encargado||"",
-        notas:r.notas||r.Notas||"",
+        fecha:    r.fecha     || r.Fecha     || "",
+        hora:     r.hora      || r.Hora      || "",
+        concepto: r.concepto  || r.Concepto  || "",
+        categoria:r.categoria || r.Categoria || "",
+        monto:    numC(r.monto || r.Monto || 0),
+        encargado:r.encargado || r.Encargado || "",
+        notas:    r.notas     || r.Notas     || "",
       }));
+
+      const hoy = todayC();
+      console.log("📅 Hoy:", hoy);
+      console.log("📅 Fechas en ventas:", CS.sales.map(s=>s.fecha));
+      console.log("📅 Ventas de hoy:", CS.sales.filter(s=>normDateC(s.fecha)===hoy).length);
+
       buildCorteC();
     } catch(err){
-      showToastC("Error: "+err.message,"error","admin");
+      console.error("❌ Error en corte:", err);
+      showToastC("Error al cargar corte: "+err.message,"error","admin");
     } finally {
       if(btn){btn.disabled=false;btn.textContent="↻ Actualizar";}
     }
