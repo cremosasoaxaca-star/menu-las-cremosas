@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Las Cremosas · Caja</title>
+  <meta name="theme-color" content="#d63560"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="caja.css"/>
+</head>
+<body>
+
+<!-- ══ PANTALLA DE LOGIN ══ -->
+<div id="screenLogin" class="screen screen--active">
+  <div class="login-wrap">
+    <div class="login-logo">🍓</div>
+    <h1 class="login-title">Las Cremosas</h1>
+    <p class="login-sub">Sistema de Caja</p>
+
+    <div class="role-tabs">
+      <button class="rtab rtab--active" data-role="empleado">👤 Empleado</button>
+      <button class="rtab" data-role="admin">🔐 Administrador</button>
+    </div>
+
+    <div class="pin-label" id="pinLabel">Ingresa tu PIN de empleado</div>
+    <div class="pin-display" id="pinDisplay">· · · ·</div>
+    <div class="pin-error hidden" id="pinError">PIN incorrecto, intenta de nuevo</div>
+
+    <div class="pin-pad">
+      <button class="pkey" data-val="1">1</button>
+      <button class="pkey" data-val="2">2</button>
+      <button class="pkey" data-val="3">3</button>
+      <button class="pkey" data-val="4">4</button>
+      <button class="pkey" data-val="5">5</button>
+      <button class="pkey" data-val="6">6</button>
+      <button class="pkey" data-val="7">7</button>
+      <button class="pkey" data-val="8">8</button>
+      <button class="pkey" data-val="9">9</button>
+      <button class="pkey pkey--del" data-val="del">⌫</button>
+      <button class="pkey" data-val="0">0</button>
+      <button class="pkey pkey--ok" data-val="ok">✓</button>
+    </div>
+
+    <a href="index.html" class="back-link">← Ver menú público</a>
+  </div>
+</div>
+
+<!-- ══ PANTALLA EMPLEADO ══ -->
+<div id="screenEmpleado" class="screen">
+  <header class="app-header">
+    <div class="app-header__left">
+      <span class="app-header__logo">🍓</span>
+      <div>
+        <div class="app-header__title">Caja · Empleado</div>
+        <div class="app-header__date" id="empDate"></div>
+      </div>
+    </div>
+    <div class="app-header__right">
+      <span class="app-header__user" id="empName"></span>
+      <button class="hbtn hbtn--ghost hbtn--sm" id="btnLogoutEmp">Salir</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <!-- ORDEN ACTUAL -->
+    <div class="order-panel">
+      <div class="order-panel__head">
+        <h2>Nueva venta</h2>
+        <div class="folio-badge">Folio #<span id="empFolio">001</span></div>
+      </div>
+
+      <!-- Lista de items en la orden -->
+      <div id="orderItems" class="order-items">
+        <div class="order-empty" id="orderEmpty">
+          Agrega productos para comenzar
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="order-total-row">
+        <span>Total de la venta</span>
+        <strong id="orderTotal" class="order-total">$0.00</strong>
+      </div>
+
+      <!-- Notas -->
+      <div class="order-notes">
+        <input id="empNotes" type="text" placeholder="Notas de la orden (opcional)…"/>
+      </div>
+
+      <!-- Botones -->
+      <div class="order-actions">
+        <button id="btnClearOrder" class="hbtn hbtn--ghost">🗑 Limpiar</button>
+        <button id="btnSaveOrder" class="hbtn hbtn--primary hbtn--block">
+          ✓ Guardar venta
+        </button>
+      </div>
+    </div>
+
+    <!-- AGREGAR PRODUCTOS -->
+    <div class="products-panel">
+      <div class="products-panel__head">
+        <h3>Agregar productos</h3>
+        <input id="empSearch" type="search" placeholder="Buscar…" class="mini-search"/>
+      </div>
+
+      <!-- Categorías rápidas -->
+      <div class="cat-pills" id="empCatPills"></div>
+
+      <!-- Grid de productos -->
+      <div class="prod-grid" id="empProdGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: Configurar item -->
+  <div class="modal-overlay hidden" id="modalItem">
+    <div class="modal-card">
+      <div class="modal-card__head">
+        <div>
+          <div class="modal-product-name" id="modalProductName"></div>
+          <div class="modal-product-price" id="modalProductBase"></div>
+        </div>
+        <button class="modal-close" id="btnModalClose">✕</button>
+      </div>
+
+      <!-- Cantidad -->
+      <div class="modal-section">
+        <label class="modal-label">Cantidad</label>
+        <div class="qty-control">
+          <button class="qty-btn" id="btnQtyMinus">−</button>
+          <span id="modalQty">1</span>
+          <button class="qty-btn" id="btnQtyPlus">+</button>
+        </div>
+      </div>
+
+      <!-- Extras disponibles -->
+      <div class="modal-section" id="modalExtrasSection">
+        <label class="modal-label">Extras (costo adicional)</label>
+        <div class="extras-grid" id="modalExtrasGrid"></div>
+      </div>
+
+      <!-- Ajuste de precio -->
+      <div class="modal-section">
+        <label class="modal-label">Precio unitario</label>
+        <div class="price-input-wrap">
+          <span>$</span>
+          <input id="modalPrice" type="number" min="0" step="1"/>
+        </div>
+        <p class="modal-hint">Puedes ajustar el precio si hay extras o modificaciones</p>
+      </div>
+
+      <!-- Resumen del item -->
+      <div class="modal-summary">
+        <span>Subtotal</span>
+        <strong id="modalSubtotal">$0.00</strong>
+      </div>
+
+      <button id="btnAddToOrder" class="hbtn hbtn--primary hbtn--block">
+        Agregar a la orden
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast de confirmación -->
+  <div class="toast hidden" id="empToast"></div>
+</div>
+
+<!-- ══ PANTALLA ADMIN ══ -->
+<div id="screenAdmin" class="screen">
+  <header class="app-header app-header--admin">
+    <div class="app-header__left">
+      <span class="app-header__logo">🍓</span>
+      <div>
+        <div class="app-header__title">Caja · Administrador</div>
+        <div class="app-header__date" id="adminDate"></div>
+      </div>
+    </div>
+    <div class="app-header__right">
+      <a href="index.html" class="hbtn hbtn--ghost hbtn--sm">Menú</a>
+      <button class="hbtn hbtn--ghost hbtn--sm" id="btnLogoutAdmin">Salir</button>
+    </div>
+  </header>
+
+  <!-- Admin tabs -->
+  <div class="admin-tabs">
+    <button class="atab atab--active" data-view="venta">🛒 Nueva venta</button>
+    <button class="atab" data-view="gasto">💸 Gasto</button>
+    <button class="atab" data-view="corte">📊 Corte</button>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- ── Vista: Venta (igual que empleado) ── -->
+    <div id="adminViewVenta" class="admin-view admin-view--active">
+      <div class="app-body">
+        <div class="order-panel">
+          <div class="order-panel__head">
+            <h2>Nueva venta</h2>
+            <div class="folio-badge">Folio #<span id="adminFolio">001</span></div>
+          </div>
+          <div id="adminOrderItems" class="order-items">
+            <div class="order-empty" id="adminOrderEmpty">Agrega productos para comenzar</div>
+          </div>
+          <div class="order-total-row">
+            <span>Total de la venta</span>
+            <strong id="adminOrderTotal" class="order-total">$0.00</strong>
+          </div>
+          <div class="order-notes">
+            <input id="adminNotes" type="text" placeholder="Notas de la orden…"/>
+          </div>
+          <div class="order-actions">
+            <button id="adminBtnClear" class="hbtn hbtn--ghost">🗑 Limpiar</button>
+            <button id="adminBtnSave" class="hbtn hbtn--primary hbtn--block">✓ Guardar venta</button>
+          </div>
+        </div>
+        <div class="products-panel">
+          <div class="products-panel__head">
+            <h3>Agregar productos</h3>
+            <input id="adminSearch" type="search" placeholder="Buscar…" class="mini-search"/>
+          </div>
+          <div class="cat-pills" id="adminCatPills"></div>
+          <div class="prod-grid" id="adminProdGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Vista: Gasto ── -->
+    <div id="adminViewGasto" class="admin-view">
+      <div class="form-wrap">
+        <h2 class="form-title">Registrar gasto</h2>
+        <div class="fgrid">
+          <div class="frow">
+            <label>Concepto</label>
+            <input id="gConcepto" type="text" placeholder="Ej. harina, leche, gas…"/>
+          </div>
+          <div class="frow">
+            <label>Categoría</label>
+            <select id="gCategoria">
+              <option value="">Selecciona</option>
+              <option value="Insumos">🛒 Insumos</option>
+              <option value="Servicios">💡 Servicios</option>
+              <option value="Renta">🏠 Renta</option>
+              <option value="Personal">👤 Personal</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Otros">📦 Otros</option>
+            </select>
+          </div>
+          <div class="frow">
+            <label>Monto ($)</label>
+            <input id="gMonto" type="number" min="0" step="1" placeholder="0"/>
+          </div>
+          <div class="frow">
+            <label>Encargado</label>
+            <input id="gEncargado" type="text" placeholder="Tu nombre"/>
+          </div>
+          <div class="frow frow--full">
+            <label>Notas</label>
+            <input id="gNotas" type="text" placeholder="Opcional…"/>
+          </div>
+          <div class="frow frow--full">
+            <button id="btnSaveGasto" class="hbtn hbtn--danger hbtn--block">Guardar gasto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Vista: Corte ── -->
+    <div id="adminViewCorte" class="admin-view">
+      <div class="corte-wrap">
+        <div class="corte-header">
+          <h2>Corte del día</h2>
+          <button id="btnRefreshCorte" class="hbtn hbtn--ghost hbtn--sm">
+            ↻ Actualizar
+          </button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi kpi--green">
+            <div class="kpi__label">Ventas hoy</div>
+            <div class="kpi__value" id="kpiVentas">$0.00</div>
+            <div class="kpi__sub" id="kpiVentasCount">0 ventas</div>
+          </div>
+          <div class="kpi kpi--amber">
+            <div class="kpi__label">Gastos hoy</div>
+            <div class="kpi__value" id="kpiGastos">$0.00</div>
+          </div>
+          <div class="kpi kpi--rose">
+            <div class="kpi__label">Utilidad</div>
+            <div class="kpi__value" id="kpiUtilidad">$0.00</div>
+          </div>
+          <div class="kpi kpi--blue">
+            <div class="kpi__label">Ticket promedio</div>
+            <div class="kpi__value" id="kpiTicket">$0.00</div>
+          </div>
+        </div>
+
+        <!-- Top productos -->
+        <div class="corte-section">
+          <h3>🏆 Productos más vendidos hoy</h3>
+          <div id="topProductos" class="rank-list">
+            <p class="empty-msg">Sin ventas registradas hoy.</p>
+          </div>
+        </div>
+
+        <!-- Ventas del día -->
+        <div class="corte-section">
+          <h3>🧾 Ventas del día</h3>
+          <div id="listaVentas" class="txn-list">
+            <p class="empty-msg">Sin ventas.</p>
+          </div>
+        </div>
+
+        <!-- Gastos del día -->
+        <div class="corte-section">
+          <h3>💸 Gastos del día</h3>
+          <div id="listaGastos" class="txn-list">
+            <p class="empty-msg">Sin gastos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast hidden" id="adminToast"></div>
+</div>
+
+<script src="config.js"></script>
+<script src="caja.js"></script>
+</body>
+</html>
