@@ -23,6 +23,6 @@ window.MENU_CONFIG = {
 
   api: {
     // URL del Google Apps Script — actualiza cuando lo crees
-    saveUrl: "https://script.google.com/macros/s/AKfycbwvHWhvDoAz_HW31DSHqokfRftTJNUzjw9Fl_Kt9ets5zrmMjPNK5aj7Q8uxf0B5aprcg/exec",
+    saveUrl: "https://script.google.com/macros/s/AKfycbyrA6lfAq07XtZ8WWUg09tMbrYzPUex_xuzbKcKFNUH3UkogHVQwiGx5cNY4YPIVvwXvA/exec",
   },
 };
