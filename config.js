@@ -22,6 +22,6 @@ pinAdmin:    "9999",  // ← solo tú lo sabes         // ← cámbialo por tu P
 
   api: {
     // URL del Google Apps Script — actualiza cuando lo crees
-    saveUrl: "https://script.google.com/macros/s/AKfycbxr1xkW5r6fbj1aazhOcfRD2IGk81CdAnIaE20ldOTCFIGhF7pP4O0BrzXEvoa4qxtS5A/exec",
+    saveUrl: "https://script.google.com/macros/s/AKfycbwvHWhvDoAz_HW31DSHqokfRftTJNUzjw9Fl_Kt9ets5zrmMjPNK5aj7Q8uxf0B5aprcg/exec",
   },
 };
