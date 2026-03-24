@@ -16,6 +16,6 @@ window.MENU_CONFIG = {
   },
 
   api: {
-    saveUrl: "https://script.google.com/macros/s/AKfycbxr1xkW5r6fbj1aazhOcfRD2IGk81CdAnIaE20ldOTCFIGhF7pP4O0BrzXEvoa4qxtS5A/exec",
+    saveUrl: "https://script.google.com/macros/s/AKfycbw7pjumalsNv26QpT7oTWT6BJ8NEapeC0H2CIbs2m69sRWiH_1QDUULYoQmFdqbDFxxwQ/exec",
   },
 };
