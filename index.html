@@ -3,267 +3,270 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Las Cremosas 🍓 | Menú</title>
+  <title>Las Cremosas 🍓 | Menú Digital</title>
   <meta name="description" content="Menú digital de Las Cremosas: fresas con crema, waffles, frappes, snacks y bebidas." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="header">
+
+  <!-- HEADER -->
+  <header class="header" id="appHeader">
     <div class="header__inner">
       <div class="brand">
-        <div class="brand__logo" aria-hidden="true">🍓</div>
+        <div class="brand__logo">🍓</div>
         <div class="brand__text">
           <div class="brand__name">Las Cremosas</div>
-          <div class="brand__tagline">Menú digital + caja</div>
+          <div class="brand__tagline">Menú digital</div>
         </div>
       </div>
-
+      <nav class="header__nav">
+        <button class="nav-tab active" data-tab="menu">Menú</button>
+        <button class="nav-tab" data-tab="caja">Caja</button>
+      </nav>
       <div class="header__actions">
-        <button id="btnShare" class="btn btn--ghost" type="button">Compartir</button>
-        <a id="btnWhats" class="btn btn--primary" href="#" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+        <button id="btnShare" class="btn btn--ghost btn--sm" title="Compartir">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Compartir
+        </button>
+        <a id="btnWhats" class="btn btn--wa" href="#" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+          Pedir
+        </a>
       </div>
     </div>
   </header>
 
-  <main class="container">
+  <!-- VISTA MENÚ -->
+  <div id="tabMenu" class="tab-view active">
+
+    <!-- HERO -->
     <section class="hero">
-      <div class="hero__card">
-        <h1>Tu dosis de felicidad 🍓</h1>
-        <p>Menú actualizado desde Google Sheets y ahora con registro manual de ventas, gastos y corte de caja.</p>
-
-        <div class="controls">
-          <div class="search">
-            <input id="searchInput" type="search" placeholder="Buscar: fresas, waffle, nachos…" autocomplete="off" />
+      <div class="hero__bg"></div>
+      <div class="hero__inner container">
+        <div class="hero__copy">
+          <h1 class="hero__title">Tu dosis<br><em>de felicidad</em> 🍓</h1>
+          <p class="hero__sub">Fresas con crema, waffles, frappes y más. Menú siempre actualizado.</p>
+        </div>
+        <div class="hero__controls">
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="searchInput" type="search" placeholder="Buscar producto…" autocomplete="off" />
           </div>
-
-          <div class="filters">
-            <select id="categorySelect" aria-label="Filtrar por categoría">
+          <div class="filter-row">
+            <select id="categorySelect" aria-label="Categoría">
               <option value="">Todas las categorías</option>
             </select>
-            <label class="toggle">
+            <label class="toggle-pill">
               <input id="toggleAvailable" type="checkbox" checked />
-              <span>Mostrar solo disponibles</span>
+              <span class="toggle-pill__track"></span>
+              <span class="toggle-pill__label">Solo disponibles</span>
             </label>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="menuTitle">
-      <div class="section__head">
-        <h2 id="menuTitle">Menú</h2>
-        <div class="meta">
-          <span id="lastUpdated" class="meta__pill">Actualizando…</span>
-          <span id="itemsCount" class="meta__pill">—</span>
+    <!-- MENÚ GRID -->
+    <main class="container main-content">
+      <div class="section-head">
+        <h2 class="section-title">Menú</h2>
+        <div class="meta-pills">
+          <span id="lastUpdated" class="pill">Cargando…</span>
+          <span id="itemsCount" class="pill">—</span>
         </div>
       </div>
 
-      <div id="menuGrid" class="grid" aria-live="polite"></div>
-      <div id="emptyState" class="empty hidden">
-        <div class="empty__emoji">😅</div>
-        <div class="empty__title">No encontré resultados</div>
-        <div class="empty__subtitle">Prueba con otra palabra o quita filtros.</div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section__head">
-        <h2>Extras</h2>
-        <p class="muted">Toppings, bases y chocolates.</p>
+      <div id="menuGrid" class="menu-grid"></div>
+      <div id="emptyState" class="empty-state hidden">
+        <span class="empty-state__emoji">😅</span>
+        <strong>Sin resultados</strong>
+        <span>Prueba con otra búsqueda o quita filtros.</span>
       </div>
 
-      <div class="extras">
-        <div class="extras__col">
-          <h3 class="extras__title">Toppings</h3>
-          <ul id="extrasToppings" class="list"></ul>
-        </div>
-        <div class="extras__col">
-          <h3 class="extras__title">Bases / Jarabes</h3>
-          <ul id="extrasBases" class="list"></ul>
-        </div>
-        <div class="extras__col">
-          <h3 class="extras__title">Chocolates</h3>
-          <ul id="extrasChocolates" class="list"></ul>
-          <div class="note">* Algunos chocolates pueden tener costo variable.</div>
-        </div>
+      <!-- EXTRAS -->
+      <div class="section-head" style="margin-top:40px">
+        <h2 class="section-title">Extras & Complementos</h2>
       </div>
-    </section>
-
-    <section class="section" id="cajaSection">
-      <div class="section__head">
-        <h2>Caja</h2>
-        <p class="muted">Registro manual de ventas y gastos.</p>
-      </div>
-
-      <div class="admin-grid">
-        <article class="panel">
-          <h3 class="panel__title">Registrar venta</h3>
-          <form id="saleForm" class="form-grid">
-            <div class="field">
-              <label for="saleProduct">Producto</label>
-              <select id="saleProduct" required>
-                <option value="">Selecciona un producto</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="saleQty">Cantidad</label>
-              <input id="saleQty" type="number" min="1" value="1" required />
-            </div>
-
-            <div class="field">
-              <label for="salePrice">Precio unitario</label>
-              <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00" required />
-            </div>
-
-            <div class="field">
-              <label for="saleManager">Encargado</label>
-              <input id="saleManager" type="text" placeholder="Nombre del encargado" />
-            </div>
-
-            <div class="field field--full">
-              <label for="saleNotes">Notas</label>
-              <input id="saleNotes" type="text" placeholder="Ej. cliente pidió sin crema" />
-            </div>
-
-            <div class="field field--full">
-              <button class="btn btn--primary btn--block" type="submit">Guardar venta</button>
-            </div>
-          </form>
-        </article>
-
-        <article class="panel">
-          <h3 class="panel__title">Registrar gasto</h3>
-          <form id="expenseForm" class="form-grid">
-            <div class="field">
-              <label for="expenseConcept">Concepto</label>
-              <input id="expenseConcept" type="text" placeholder="Ej. harina" required />
-            </div>
-
-            <div class="field">
-              <label for="expenseCategory">Categoría</label>
-              <select id="expenseCategory" required>
-                <option value="">Selecciona categoría</option>
-                <option value="Insumos">Insumos</option>
-                <option value="Servicios">Servicios</option>
-                <option value="Renta">Renta</option>
-                <option value="Personal">Personal</option>
-                <option value="Transporte">Transporte</option>
-                <option value="Otros">Otros</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="expenseAmount">Monto</label>
-              <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
-            </div>
-
-            <div class="field">
-              <label for="expenseManager">Encargado</label>
-              <input id="expenseManager" type="text" placeholder="Nombre del encargado" />
-            </div>
-
-            <div class="field field--full">
-              <label for="expenseNotes">Notas</label>
-              <input id="expenseNotes" type="text" placeholder="Ej. compra en abarrotes" />
-            </div>
-
-            <div class="field field--full">
-              <button class="btn btn--primary btn--block" type="submit">Guardar gasto</button>
-            </div>
-          </form>
-        </article>
-      </div>
-
-      <div class="section__head section__head--mt">
-        <h2>Corte del día</h2>
-        <button id="refreshSummary" class="btn btn--ghost" type="button">Actualizar corte</button>
-      </div>
-
-      <div class="summary-grid">
-        <div class="summary-card">
-          <div class="summary-card__label">Ventas del día</div>
-          <div id="salesTodayTotal" class="summary-card__value">$0.00</div>
+      <div class="extras-grid">
+        <div class="extras-card">
+          <div class="extras-card__icon">🍫</div>
+          <h3>Chocolates</h3>
+          <ul id="extrasChocolates" class="extras-list"></ul>
         </div>
-        <div class="summary-card">
-          <div class="summary-card__label">Gastos del día</div>
-          <div id="expensesTodayTotal" class="summary-card__value">$0.00</div>
+        <div class="extras-card">
+          <div class="extras-card__icon">🫙</div>
+          <h3>Bases / Jarabes</h3>
+          <ul id="extrasBases" class="extras-list"></ul>
         </div>
-        <div class="summary-card">
-          <div class="summary-card__label">Utilidad aproximada</div>
-          <div id="profitTodayTotal" class="summary-card__value">$0.00</div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-card__label">Número de ventas</div>
-          <div id="salesCountToday" class="summary-card__value">0</div>
+        <div class="extras-card">
+          <div class="extras-card__icon">✨</div>
+          <h3>Toppings</h3>
+          <ul id="extrasToppings" class="extras-list"></ul>
+          <p class="extras-note">* Algunos toppings pueden tener costo adicional.</p>
         </div>
       </div>
 
-      <div class="panel panel--mt">
-        <h3 class="panel__title">Productos vendidos hoy</h3>
-        <div id="topProductsToday" class="mini-list">
-          <div class="mini-list__empty">Todavía no hay ventas registradas hoy.</div>
+      <!-- CTA WHATSAPP -->
+      <div class="wa-cta">
+        <div class="wa-cta__left">
+          <strong>¿Listo para ordenar?</strong>
+          <span>Te atendemos por WhatsApp 🍓</span>
+        </div>
+        <a id="ctaWhats" class="btn btn--wa" href="#" target="_blank" rel="noopener">Abrir WhatsApp</a>
+      </div>
+
+      <footer class="footer">
+        <span>© <span id="yearNow"></span> Las Cremosas</span>
+        <span class="dot">·</span>
+        <a href="#" id="openHow" class="link">¿Cómo se actualiza el menú?</a>
+      </footer>
+    </main>
+  </div>
+
+  <!-- VISTA CAJA -->
+  <div id="tabCaja" class="tab-view">
+    <div class="container" style="padding-top:24px; padding-bottom:60px">
+
+      <!-- CORTE DEL DÍA -->
+      <div class="corte-grid">
+        <div class="corte-card corte-card--sales">
+          <div class="corte-card__label">Ventas hoy</div>
+          <div id="salesTodayTotal" class="corte-card__value">$0.00</div>
+          <div id="salesCountToday" class="corte-card__sub">0 ventas</div>
+        </div>
+        <div class="corte-card corte-card--expenses">
+          <div class="corte-card__label">Gastos hoy</div>
+          <div id="expensesTodayTotal" class="corte-card__value">$0.00</div>
+        </div>
+        <div class="corte-card corte-card--profit">
+          <div class="corte-card__label">Utilidad aprox.</div>
+          <div id="profitTodayTotal" class="corte-card__value">$0.00</div>
+        </div>
+        <div class="corte-card corte-card--refresh">
+          <button id="refreshSummary" class="btn btn--ghost btn--sm btn--block">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            Actualizar corte
+          </button>
+          <div class="corte-card__label" style="margin-top:10px">Productos de hoy</div>
+          <div id="topProductsToday" class="mini-list">
+            <div class="mini-list__empty">Sin ventas aún.</div>
+          </div>
         </div>
       </div>
 
       <div id="adminMessage" class="status-message hidden"></div>
-    </section>
 
-    <section class="section">
-      <div class="section__head">
-        <h2>Envío</h2>
-        <p class="muted">Pregunta por disponibilidad y zonas de entrega.</p>
+      <!-- TABS CAJA -->
+      <div class="caja-tabs">
+        <button class="caja-tab active" data-form="venta">Registrar venta</button>
+        <button class="caja-tab" data-form="gasto">Registrar gasto</button>
       </div>
-      <div class="cta">
-        <div class="cta__text">
-          <div class="cta__title">¿Listo para pedir?</div>
-          <div class="cta__subtitle">Te respondemos por WhatsApp.</div>
-        </div>
-        <a id="ctaWhats" class="btn btn--primary" href="#" target="_blank" rel="noopener">Abrir WhatsApp</a>
-      </div>
-    </section>
 
-    <footer class="footer">
-      <div class="footer__inner">
-        <div class="footer__small">
-          <span>© <span id="yearNow"></span> Las Cremosas</span>
-          <span class="dot">•</span>
-          <a href="#" id="openHow" class="link">¿Cómo se actualiza?</a>
-        </div>
-        <div class="footer__small muted">
-          Hecho para verse bien en cualquier dispositivo.
+      <!-- FORM VENTA -->
+      <div id="formVenta" class="panel caja-form active">
+        <div class="form-grid" id="saleForm">
+          <div class="field">
+            <label for="saleProduct">Producto</label>
+            <select id="saleProduct" required>
+              <option value="">Selecciona producto</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="saleQty">Cantidad</label>
+            <input id="saleQty" type="number" min="1" value="1" required />
+          </div>
+          <div class="field">
+            <label for="salePrice">Precio unitario ($)</label>
+            <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00" required />
+          </div>
+          <div class="field">
+            <label>Total estimado</label>
+            <div id="saleTotalPreview" class="total-preview">—</div>
+          </div>
+          <div class="field">
+            <label for="saleManager">Encargado</label>
+            <input id="saleManager" type="text" placeholder="Nombre" />
+          </div>
+          <div class="field field--full">
+            <label for="saleNotes">Notas</label>
+            <input id="saleNotes" type="text" placeholder="Ej. sin crema, extra fresa…" />
+          </div>
+          <div class="field field--full">
+            <button class="btn btn--primary btn--block" id="btnSaveSale" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar venta
+            </button>
+          </div>
         </div>
       </div>
-    </footer>
-  </main>
 
+      <!-- FORM GASTO -->
+      <div id="formGasto" class="panel caja-form">
+        <div class="form-grid" id="expenseForm">
+          <div class="field">
+            <label for="expenseConcept">Concepto</label>
+            <input id="expenseConcept" type="text" placeholder="Ej. harina, leche…" required />
+          </div>
+          <div class="field">
+            <label for="expenseCategory">Categoría</label>
+            <select id="expenseCategory" required>
+              <option value="">Selecciona</option>
+              <option value="Insumos">🛒 Insumos</option>
+              <option value="Servicios">💡 Servicios</option>
+              <option value="Renta">🏠 Renta</option>
+              <option value="Personal">👤 Personal</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Otros">📦 Otros</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="expenseAmount">Monto ($)</label>
+            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
+          </div>
+          <div class="field">
+            <label for="expenseManager">Encargado</label>
+            <input id="expenseManager" type="text" placeholder="Nombre" />
+          </div>
+          <div class="field field--full">
+            <label for="expenseNotes">Notas</label>
+            <input id="expenseNotes" type="text" placeholder="Ej. compra en abarrotes del centro" />
+          </div>
+          <div class="field field--full">
+            <button class="btn btn--danger btn--block" id="btnSaveExpense" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Guardar gasto
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DIALOG: Cómo se actualiza -->
   <dialog id="howDialog" class="dialog">
     <div class="dialog__card">
       <div class="dialog__head">
         <div>
-          <div class="dialog__title">Actualizar desde Google Sheets</div>
-          <div class="dialog__subtitle">No necesitas programar para cambiar productos y precios.</div>
+          <div class="dialog__title">📊 Actualizar desde Google Sheets</div>
+          <div class="dialog__sub">Sin código, solo edita tu hoja de cálculo.</div>
         </div>
-        <button id="closeHow" class="btn btn--ghost" type="button">Cerrar</button>
+        <button id="closeHow" class="btn btn--ghost btn--sm">Cerrar</button>
       </div>
-
       <ol class="steps">
-        <li>Edita tus hojas <strong>DATA_ITEMS</strong>, <strong>DATA_EXTRAS</strong>, <strong>VENTAS</strong> y <strong>GASTOS</strong>.</li>
-        <li>Publica como CSV las hojas que deban leerse desde la web.</li>
-        <li>Pega esos links en <code>js/config.js</code>.</li>
-        <li>Configura la URL de tu <strong>Google Apps Script</strong> para guardar ventas y gastos.</li>
+        <li>Edita las hojas <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> con tus productos.</li>
+        <li>En Google Sheets: <em>Archivo → Compartir → Publicar en la web</em>, selecciona la hoja y elige <strong>CSV</strong>.</li>
+        <li>Pega esos links en <code>config.js</code>.</li>
+        <li>Las ventas y gastos se guardan en <strong>VENTAS</strong> y <strong>GASTOS</strong> a través del Apps Script.</li>
       </ol>
-
-      <div class="hint">
-        Tip: el menú sigue siendo público, pero la caja conviene usarla solo internamente.
-      </div>
+      <div class="hint">💡 El menú es público; la caja úsala solo internamente.</div>
     </div>
   </dialog>
 
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
