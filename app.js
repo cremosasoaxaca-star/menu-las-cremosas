@@ -201,6 +201,7 @@ function clearSections() {
 
 function renderAll() {
   clearSections();
+
   const q   = S.q.trim().toLowerCase();
   const cat = S.cat;
   let count = 0;
@@ -208,36 +209,47 @@ function renderAll() {
   for (const it of S.items) {
     if (S.avail && !bool(it.Disponible, true)) continue;
     if (cat && it.Categoria !== cat) continue;
+
     if (q) {
-      const hay = [it.Nombre,it.Variante,it.Descripcion,it.Categoria,it.Badges,it.Notas]
-        .map(x=>String(x||"").toLowerCase()).join(" ");
+      const hay = [it.Nombre, it.Variante, it.Descripcion, it.Categoria, it.Badges, it.Notas]
+        .map(x => String(x || "").toLowerCase())
+        .join(" ");
       if (!hay.includes(q)) continue;
     }
-    const sec   = getSec(it.Categoria);
+
+    const sec = getSec(it.Categoria);
     const avail = bool(it.Disponible, true);
-    if (sec === "fresas") renderSizeCard(it, avail);
-    else if (sec) renderProdCard(it, avail, sec);
+
+    if (sec === "fresas") {
+      renderSizeCard(it, avail);
+    } else if (sec) {
+      renderProdCard(it, avail, sec);
+    }
+
     count++;
   }
 
+  // 🔥 ESTA ES LA LÍNEA CLAVE QUE TE FALTABA
+  renderExtras();
+
   [
-    {id:"sec-fresas",     grid:"#sizes-fresas"},
-    {id:"sec-especiales", grid:"#grid-especiales"},
-    {id:"sec-frappes",    grid:"#grid-frappes"},
-    {id:"sec-waffles",    grid:"#grid-waffles"},
-    {id:"sec-snacks",     grid:"#grid-snacks"},
-    {id:"sec-bebidas",    grid:"#grid-bebidas"},
-  ].forEach(({id,grid})=>{
-    const secEl=$(`#${id}`);
-    const gEl=$(grid);
-    if(secEl) secEl.style.display = (gEl && gEl.children.length > 0) ? "" : "none";
+    { id: "sec-fresas", grid: "#sizes-fresas" },
+    { id: "sec-especiales", grid: "#grid-especiales" },
+    { id: "sec-frappes", grid: "#grid-frappes" },
+    { id: "sec-waffles", grid: "#grid-waffles" },
+    { id: "sec-snacks", grid: "#grid-snacks" },
+    { id: "sec-bebidas", grid: "#grid-bebidas" },
+  ].forEach(({ id, grid }) => {
+    const secEl = document.querySelector(`#${id}`);
+    const gEl = document.querySelector(grid);
+    if (secEl) secEl.style.display = (gEl && gEl.children.length > 0) ? "" : "none";
   });
 
-  $("#emptyState")?.classList.toggle("hidden", count > 0);
-  const ic=$("#itemsCount");
-  if(ic) ic.textContent=`${count} productos`;
-}
+  document.querySelector("#emptyState")?.classList.toggle("hidden", count > 0);
 
+  const ic = document.querySelector("#itemsCount");
+  if (ic) ic.textContent = `${count} productos`;
+}
 function renderSizeCard(it, avail) {
   const grid=$("#sizes-fresas"); if(!grid)return;
   const p = num(it.Precio);
