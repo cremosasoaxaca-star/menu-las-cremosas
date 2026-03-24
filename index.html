@@ -228,131 +228,150 @@
 <!-- ══════════════ CAJA VIEW ══════════════ -->
 <div id="tabCaja" class="tview">
 
-  <!-- PIN LOCK -->
-  <div id="cajaLocked" class="pin-screen">
-    <div class="pin-card">
-      <div class="pin-card__top">
-        <span class="pin-card__icon">🔐</span>
-        <h2>Acceso a Caja</h2>
-        <p>Solo para encargados · ingresa tu PIN</p>
+  <!-- LOGIN CON ROLES -->
+  <div id="cajaLogin" class="caja-login-screen">
+    <div class="caja-login-card">
+      <div class="caja-login-logo">🍓</div>
+      <h2 class="caja-login-title">Sistema de Caja</h2>
+      <p class="caja-login-sub">Las Cremosas</p>
+
+      <div class="caja-role-tabs">
+        <button class="crtab crtab--active" data-role="empleado">👤 Empleado</button>
+        <button class="crtab" data-role="admin">🔐 Admin</button>
       </div>
-      <div id="pinDisplay" class="pin-dots">· · · ·</div>
-      <div id="pinError" class="pin-err hidden">PIN incorrecto, inténtalo de nuevo</div>
-      <div class="pin-pad">
-        <button class="pkey" data-val="1">1</button>
-        <button class="pkey" data-val="2">2</button>
-        <button class="pkey" data-val="3">3</button>
-        <button class="pkey" data-val="4">4</button>
-        <button class="pkey" data-val="5">5</button>
-        <button class="pkey" data-val="6">6</button>
-        <button class="pkey" data-val="7">7</button>
-        <button class="pkey" data-val="8">8</button>
-        <button class="pkey" data-val="9">9</button>
-        <button class="pkey pkey--del" data-val="del">⌫</button>
-        <button class="pkey" data-val="0">0</button>
-        <button class="pkey pkey--ok" data-val="ok">✓</button>
+
+      <div class="caja-pin-label" id="cajaRoleLabel">PIN de empleado</div>
+      <div class="caja-pin-display" id="cajaPinDisplay">· · · ·</div>
+      <div class="caja-pin-error hidden" id="cajaPinError">PIN incorrecto, intenta de nuevo</div>
+
+      <div class="caja-pin-pad">
+        <button class="cpkey" data-val="1">1</button>
+        <button class="cpkey" data-val="2">2</button>
+        <button class="cpkey" data-val="3">3</button>
+        <button class="cpkey" data-val="4">4</button>
+        <button class="cpkey" data-val="5">5</button>
+        <button class="cpkey" data-val="6">6</button>
+        <button class="cpkey" data-val="7">7</button>
+        <button class="cpkey" data-val="8">8</button>
+        <button class="cpkey" data-val="9">9</button>
+        <button class="cpkey cpkey--del" data-val="del">⌫</button>
+        <button class="cpkey" data-val="0">0</button>
+        <button class="cpkey cpkey--ok" data-val="ok">✓</button>
       </div>
     </div>
   </div>
 
-  <!-- CAJA CONTENT -->
-  <div id="cajaContent" class="hidden">
-    <div class="caja-wrap">
-
-      <!-- Header caja -->
-      <div class="caja-hd">
+  <!-- VISTA EMPLEADO -->
+  <div id="cajaEmpleado" class="hidden">
+    <div class="caja-app-header">
+      <div class="caja-app-header__left">
+        <span>🍓</span>
         <div>
-          <h2 class="caja-hd__title">Caja del día 🧾</h2>
-          <p class="caja-hd__date" id="cajaDate"></p>
-        </div>
-        <button id="btnLockCaja" class="nav-btn nav-btn--ghost">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Cerrar sesión
-        </button>
-      </div>
-
-      <!-- Corte -->
-      <div class="corte">
-        <div class="corte-card corte-card--g">
-          <p>Ventas hoy</p>
-          <strong id="salesTodayTotal">$0.00</strong>
-          <small id="salesCountToday">0 ventas</small>
-        </div>
-        <div class="corte-card corte-card--r">
-          <p>Gastos hoy</p>
-          <strong id="expensesTodayTotal">$0.00</strong>
-        </div>
-        <div class="corte-card corte-card--p">
-          <p>Utilidad</p>
-          <strong id="profitTodayTotal">$0.00</strong>
+          <div class="caja-app-header__title">Caja · Empleado</div>
+          <div class="caja-app-header__date" id="empDate"></div>
         </div>
       </div>
+      <button class="nav-btn nav-btn--ghost nav-btn--sm" id="btnLogoutEmp">Salir</button>
+    </div>
 
-      <!-- Productos del día -->
-      <div class="caja-panel">
-        <div class="caja-panel__hd">
-          <h3>Productos vendidos hoy</h3>
-          <button id="refreshSummary" class="nav-btn nav-btn--ghost nav-btn--sm">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-            Actualizar
-          </button>
+    <div class="caja-split">
+      <!-- Orden -->
+      <div class="caja-order">
+        <div class="caja-order__head">
+          <h3>Nueva venta</h3>
+          <span class="caja-folio">Folio #<span id="empFolio">0001</span></span>
         </div>
-        <div id="topProductsToday" class="prod-list">
-          <p class="prod-list__empty">Sin ventas registradas hoy.</p>
+        <div id="empOrderItems" class="caja-order-items">
+          <div class="caja-order-empty">Agrega productos para empezar</div>
+        </div>
+        <div class="caja-order-total">
+          <span>Total</span>
+          <strong id="empOrderTotal">$0.00</strong>
+        </div>
+        <input id="empNotes" class="caja-notes-input" type="text" placeholder="Notas de la orden…"/>
+        <div class="caja-order-btns">
+          <button id="empBtnClear" class="nav-btn nav-btn--ghost">🗑 Limpiar</button>
+          <button id="empBtnSave" class="nav-btn nav-btn--primary nav-btn--block">✓ Guardar venta</button>
         </div>
       </div>
 
-      <div id="adminMessage" class="status-msg hidden"></div>
-
-      <!-- Sub-tabs -->
-      <div class="ctabs">
-        <button class="ctab ctab--active" data-form="venta">+ Nueva venta</button>
-        <button class="ctab" data-form="gasto">− Nuevo gasto</button>
+      <!-- Productos -->
+      <div class="caja-products">
+        <div class="caja-products__head">
+          <h3>Productos</h3>
+          <input id="empSearch" type="search" placeholder="Buscar…" class="caja-mini-search"/>
+        </div>
+        <div class="caja-cat-pills" id="empCatPills"></div>
+        <div class="caja-prod-grid" id="empProdGrid"></div>
       </div>
+    </div>
 
-      <!-- Form venta -->
-      <div id="formVenta" class="caja-panel cform cform--active">
-        <div class="fgrid">
-          <div class="frow frow--full">
-            <label>Producto</label>
-            <select id="saleProduct"><option value="">Selecciona…</option></select>
-          </div>
-          <div class="frow">
-            <label>Cantidad</label>
-            <input id="saleQty" type="number" min="1" value="1"/>
-          </div>
-          <div class="frow">
-            <label>Precio unitario ($)</label>
-            <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00"/>
-          </div>
-          <div class="frow frow--full">
-            <label>Total a cobrar</label>
-            <div id="saleTotalPreview" class="total-box">—</div>
-          </div>
-          <div class="frow">
-            <label>Encargado</label>
-            <input id="saleManager" type="text" placeholder="Tu nombre"/>
-          </div>
-          <div class="frow">
-            <label>Notas</label>
-            <input id="saleNotes" type="text" placeholder="Observaciones…"/>
-          </div>
-          <div class="frow frow--full">
-            <button id="btnSaveSale" class="btn btn--primary btn--block">Guardar venta</button>
-          </div>
+    <div class="caja-toast hidden" id="empToast"></div>
+  </div>
+
+  <!-- VISTA ADMIN -->
+  <div id="cajaAdmin" class="hidden">
+    <div class="caja-app-header caja-app-header--admin">
+      <div class="caja-app-header__left">
+        <span>🍓</span>
+        <div>
+          <div class="caja-app-header__title">Caja · Administrador</div>
+          <div class="caja-app-header__date" id="adminDate"></div>
         </div>
       </div>
+      <button class="nav-btn nav-btn--ghost nav-btn--sm" id="btnLogoutAdmin">Salir</button>
+    </div>
 
-      <!-- Form gasto -->
-      <div id="formGasto" class="caja-panel cform">
-        <div class="fgrid">
-          <div class="frow">
+    <div class="caja-admin-tabs">
+      <button class="catab catab--active" data-view="venta">🛒 Venta</button>
+      <button class="catab" data-view="gasto">💸 Gasto</button>
+      <button class="catab" data-view="corte">📊 Corte</button>
+    </div>
+
+    <!-- Admin: Venta -->
+    <div id="cajaAdminVenta" class="cadmin-view cadmin-view--active">
+      <div class="caja-split">
+        <div class="caja-order">
+          <div class="caja-order__head">
+            <h3>Nueva venta</h3>
+            <span class="caja-folio">Folio #<span id="adminFolio">0001</span></span>
+          </div>
+          <div id="adminOrderItems" class="caja-order-items">
+            <div class="caja-order-empty">Agrega productos para empezar</div>
+          </div>
+          <div class="caja-order-total">
+            <span>Total</span>
+            <strong id="adminOrderTotal">$0.00</strong>
+          </div>
+          <input id="adminNotes" class="caja-notes-input" type="text" placeholder="Notas de la orden…"/>
+          <div class="caja-order-btns">
+            <button id="adminBtnClear" class="nav-btn nav-btn--ghost">🗑 Limpiar</button>
+            <button id="adminBtnSave" class="nav-btn nav-btn--primary nav-btn--block">✓ Guardar venta</button>
+          </div>
+        </div>
+        <div class="caja-products">
+          <div class="caja-products__head">
+            <h3>Productos</h3>
+            <input id="adminSearch" type="search" placeholder="Buscar…" class="caja-mini-search"/>
+          </div>
+          <div class="caja-cat-pills" id="adminCatPills"></div>
+          <div class="caja-prod-grid" id="adminProdGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Gasto -->
+    <div id="cajaAdminGasto" class="cadmin-view">
+      <div class="caja-form-wrap">
+        <h3 class="caja-form-title">Registrar gasto</h3>
+        <div class="caja-fgrid">
+          <div class="caja-frow">
             <label>Concepto</label>
-            <input id="expenseConcept" type="text" placeholder="Ej. harina, leche…"/>
+            <input id="gConcepto" type="text" placeholder="Ej. harina, leche…"/>
           </div>
-          <div class="frow">
+          <div class="caja-frow">
             <label>Categoría</label>
-            <select id="expenseCategory">
+            <select id="gCategoria">
               <option value="">Selecciona</option>
               <option value="Insumos">🛒 Insumos</option>
               <option value="Servicios">💡 Servicios</option>
@@ -362,26 +381,116 @@
               <option value="Otros">📦 Otros</option>
             </select>
           </div>
-          <div class="frow">
+          <div class="caja-frow">
             <label>Monto ($)</label>
-            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00"/>
+            <input id="gMonto" type="number" min="0" step="1" placeholder="0"/>
           </div>
-          <div class="frow">
+          <div class="caja-frow">
             <label>Encargado</label>
-            <input id="expenseManager" type="text" placeholder="Tu nombre"/>
+            <input id="gEncargado" type="text" placeholder="Tu nombre"/>
           </div>
-          <div class="frow frow--full">
+          <div class="caja-frow caja-frow--full">
             <label>Notas</label>
-            <input id="expenseNotes" type="text" placeholder="Ej. compra en mercado"/>
+            <input id="gNotas" type="text" placeholder="Opcional…"/>
           </div>
-          <div class="frow frow--full">
-            <button id="btnSaveExpense" class="btn btn--danger btn--block">Guardar gasto</button>
+          <div class="caja-frow caja-frow--full">
+            <button id="btnSaveGasto" class="nav-btn nav-btn--danger nav-btn--block">Guardar gasto</button>
           </div>
         </div>
       </div>
+    </div>
 
+    <!-- Admin: Corte -->
+    <div id="cajaAdminCorte" class="cadmin-view">
+      <div class="caja-corte-wrap">
+        <div class="caja-corte-hd">
+          <h3>Corte del día</h3>
+          <button id="btnRefreshCorte" class="nav-btn nav-btn--ghost nav-btn--sm">↻ Actualizar</button>
+        </div>
+
+        <div class="caja-kpi-grid">
+          <div class="caja-kpi caja-kpi--green">
+            <div class="caja-kpi__label">Ventas hoy</div>
+            <div class="caja-kpi__value" id="kpiVentas">$0.00</div>
+            <div class="caja-kpi__sub" id="kpiVentasCount">0 ventas</div>
+          </div>
+          <div class="caja-kpi caja-kpi--amber">
+            <div class="caja-kpi__label">Gastos hoy</div>
+            <div class="caja-kpi__value" id="kpiGastos">$0.00</div>
+          </div>
+          <div class="caja-kpi caja-kpi--rose">
+            <div class="caja-kpi__label">Utilidad</div>
+            <div class="caja-kpi__value" id="kpiUtilidad">$0.00</div>
+          </div>
+          <div class="caja-kpi caja-kpi--blue">
+            <div class="caja-kpi__label">Ticket promedio</div>
+            <div class="caja-kpi__value" id="kpiTicket">$0.00</div>
+          </div>
+        </div>
+
+        <div class="caja-corte-section">
+          <h4>🏆 Más vendidos hoy</h4>
+          <div id="topProductos" class="caja-rank-list"><p class="caja-empty-msg">Sin ventas.</p></div>
+        </div>
+
+        <div class="caja-corte-section">
+          <h4>🧾 Ventas del día</h4>
+          <div id="listaVentas" class="caja-txn-list"><p class="caja-empty-msg">Sin ventas.</p></div>
+        </div>
+
+        <div class="caja-corte-section">
+          <h4>💸 Gastos del día</h4>
+          <div id="listaGastos" class="caja-txn-list"><p class="caja-empty-msg">Sin gastos.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="caja-toast hidden" id="adminToast"></div>
+  </div>
+
+  <!-- MODAL: Configurar item -->
+  <div class="caja-modal-overlay hidden" id="modalItem">
+    <div class="caja-modal-card">
+      <div class="caja-modal-head">
+        <div>
+          <div class="caja-modal-name" id="modalProductName"></div>
+          <div class="caja-modal-base" id="modalProductBase"></div>
+        </div>
+        <button class="caja-modal-close" id="btnModalClose">✕</button>
+      </div>
+
+      <div class="caja-modal-section">
+        <label class="caja-modal-label">Cantidad</label>
+        <div class="caja-qty-ctrl">
+          <button class="caja-qty-btn" id="btnQtyMinus">−</button>
+          <span id="modalQty">1</span>
+          <button class="caja-qty-btn" id="btnQtyPlus">+</button>
+        </div>
+      </div>
+
+      <div class="caja-modal-section" id="modalExtrasSection">
+        <label class="caja-modal-label">Extras con costo adicional</label>
+        <div class="caja-extras-grid" id="modalExtrasGrid"></div>
+      </div>
+
+      <div class="caja-modal-section">
+        <label class="caja-modal-label">Precio unitario (ajustable)</label>
+        <div class="caja-price-wrap">
+          <span>$</span>
+          <input id="modalPrice" type="number" min="0" step="1"/>
+        </div>
+        <p class="caja-modal-hint">Se actualiza automáticamente al agregar extras</p>
+      </div>
+
+      <div class="caja-modal-summary">
+        <span>Subtotal</span>
+        <strong id="modalSubtotal">$0.00</strong>
+      </div>
+
+      <button id="btnAddToOrder" class="nav-btn nav-btn--primary nav-btn--block">Agregar a la orden</button>
     </div>
   </div>
+
 </div><!-- /tabCaja -->
 
 <!-- DIALOG -->
@@ -403,5 +512,6 @@
 
 <script src="config.js"></script>
 <script src="app.js"></script>
+<script src="caja.js"></script>
 </body>
 </html>
