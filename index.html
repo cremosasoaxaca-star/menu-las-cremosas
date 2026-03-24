@@ -3,413 +3,379 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Las Cremosas 🍓 | Menú</title>
-  <meta name="description" content="Fresas con crema, waffles, frappes, snacks y más. ¡Arma tu vaso perfecto!"/>
-  <meta name="theme-color" content="#e8396b"/>
+  <title>Las Cremosas 🍓</title>
+  <meta name="description" content="Fresas con crema, waffles, frappes y más en Oaxaca."/>
+  <meta name="theme-color" content="#d63560"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 
-<!-- ═══════════════ HEADER ═══════════════ -->
-<header class="site-header">
-  <div class="site-header__inner">
-    <div class="brand">
-      <span class="brand__emoji">🍓</span>
-      <span class="brand__name">Las Cremosas</span>
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="#">
+      <span class="nav__logo">🍓</span>
+      <span class="nav__name">Las Cremosas</span>
+    </a>
+    <div class="nav__tabs">
+      <button class="ntab ntab--active" data-tab="menu">Menú</button>
+      <button class="ntab" data-tab="caja">Caja</button>
     </div>
-    <nav class="top-nav">
-      <button class="nav-pill active" data-tab="menu">Menú</button>
-      <button class="nav-pill" data-tab="caja">🔒 Caja</button>
-    </nav>
-    <div class="header-actions">
-      <button id="btnShare" class="hbtn hbtn--ghost" title="Compartir">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <div class="nav__actions">
+      <button id="btnShare" class="nav-btn nav-btn--ghost">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         <span>Compartir</span>
       </button>
-      <a id="btnWhats" class="hbtn hbtn--wa" href="#" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+      <a id="btnWhats" href="#" target="_blank" class="nav-btn nav-btn--wa">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
         Pedir
       </a>
     </div>
   </div>
-</header>
+</nav>
 
-<!-- ═══════════════ TAB MENÚ ═══════════════ -->
-<div id="tabMenu" class="tab-view active">
+<!-- ══════════════ MENÚ VIEW ══════════════ -->
+<div id="tabMenu" class="tview tview--active">
 
-  <!-- HERO con drip -->
-  <div class="hero">
-    <div class="hero__confetti" aria-hidden="true">
-      <span>🍓</span><span>✨</span><span>🍓</span><span>🍦</span><span>🍓</span><span>✨</span><span>🍓</span><span>🍦</span>
-    </div>
-    <div class="hero__inner">
-      <p class="hero__eyebrow">¡Bienvenid@ a</p>
-      <h1 class="hero__title">Las Cremosas</h1>
-      <p class="hero__sub">Arma tu vaso perfecto de fresas con crema 🍓</p>
-      <div class="hero__search-box">
-        <div class="search-wrap">
-          <svg class="search-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input id="searchInput" type="search" placeholder="Buscar producto…" autocomplete="off"/>
-        </div>
-        <div class="filter-row">
-          <select id="categorySelect"><option value="">Todas las categorías</option></select>
-          <label class="avail-toggle">
-            <input id="toggleAvailable" type="checkbox" checked/>
-            <span class="avail-toggle__track"></span>
-            <span>Solo disponibles</span>
-          </label>
-        </div>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero__left">
+      <p class="hero__kicker">Oaxaca, México 🇲🇽</p>
+      <h1 class="hero__h1">
+        Fresas con crema<br>
+        <em>hechas con amor</em>
+      </h1>
+      <p class="hero__desc">Arma tu vaso perfecto, elige tu tamaño, tus toppings y tu jarabe favorito. Todo fresco, todo rico.</p>
+      <div class="hero__ctas">
+        <a id="heroWhats" href="#" class="btn btn--primary">Hacer pedido →</a>
+        <a href="#menu-start" class="btn btn--outline">Ver menú completo</a>
       </div>
     </div>
-    <div class="hero__drip" aria-hidden="true">
-      <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-        <path d="M0,0 C240,60 480,80 720,60 C960,40 1200,70 1440,30 L1440,80 L0,80 Z" fill="#fdf0f5"/>
-        <!-- drip drops -->
-        <ellipse cx="120" cy="80" rx="10" ry="18" fill="#fdf0f5"/>
-        <ellipse cx="340" cy="80" rx="8" ry="24" fill="#fdf0f5"/>
-        <ellipse cx="560" cy="80" rx="12" ry="20" fill="#fdf0f5"/>
-        <ellipse cx="780" cy="80" rx="9" ry="28" fill="#fdf0f5"/>
-        <ellipse cx="980" cy="80" rx="11" ry="16" fill="#fdf0f5"/>
-        <ellipse cx="1200" cy="80" rx="8" ry="22" fill="#fdf0f5"/>
-        <ellipse cx="1380" cy="80" rx="10" ry="18" fill="#fdf0f5"/>
-      </svg>
+    <div class="hero__right" aria-hidden="true">
+      <div class="hero__blob"></div>
+      <div class="hero__emojis">
+        <span class="fe fe--1">🍓</span>
+        <span class="fe fe--2">🍦</span>
+        <span class="fe fe--3">🧇</span>
+        <span class="fe fe--4">🍓</span>
+        <span class="fe fe--5">🥤</span>
+        <span class="fe fe--6">✨</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- SEARCH BAR -->
+  <div class="searchbar-wrap" id="menu-start">
+    <div class="searchbar">
+      <div class="sb__input-wrap">
+        <svg class="sb__icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="searchInput" type="search" placeholder="Buscar: frappe, waffle, nachos…" autocomplete="off"/>
+      </div>
+      <select id="categorySelect" class="sb__select">
+        <option value="">Todas las categorías</option>
+      </select>
+      <label class="sb__toggle">
+        <input id="toggleAvailable" type="checkbox" checked/>
+        <span class="sb__track"></span>
+        <span>Disponibles</span>
+      </label>
+      <div class="sb__meta">
+        <span id="lastUpdated"></span>
+        <span id="itemsCount"></span>
+      </div>
     </div>
   </div>
 
-  <!-- MAIN MENU CONTENT -->
-  <main class="page-content" id="menuContent">
-    <div class="wrap">
+  <!-- MENU CONTENT -->
+  <div class="page-wrap">
 
-      <!-- Meta info -->
-      <div class="meta-bar">
-        <span id="lastUpdated" class="meta-chip">Cargando…</span>
-        <span id="itemsCount" class="meta-chip">—</span>
+    <!-- ── SECCIÓN: FRESAS CON CREMA ── -->
+    <section class="msec" id="sec-fresas" data-cat="Fresas con crema">
+      <div class="msec__head">
+        <div class="msec__label msec__label--pink">🍓 Fresas con Crema</div>
+        <p class="msec__sub">Arma tu vaso ideal — elige tamaño, toppings y jarabe</p>
       </div>
 
-      <!-- ──────────────────────────────────────────
-           SECCIÓN 1: FRESAS CON CREMA
-      ────────────────────────────────────────── -->
-      <section class="menu-section" id="sec-fresas-con-crema">
-        <div class="section-banner section-banner--pink">
-          <div class="section-banner__emoji">🍓</div>
-          <div class="section-banner__text">
-            <h2>Fresas con Crema</h2>
-            <p>¡Arma tu vaso perfecto!</p>
-          </div>
-        </div>
-
-        <!-- Paso 1: Tamaño -->
-        <div class="step-card">
-          <div class="step-num">Paso 1</div>
-          <h3 class="step-title">🥤 Escoge el tamaño</h3>
-          <div class="size-grid" id="grid-fresas-con-crema"></div>
-        </div>
-
-        <!-- Paso 2: Qué lleva -->
-        <div class="included-card">
-          <h3 class="included-title">🫙 ¿Qué lleva tu vaso?</h3>
-          <ul class="included-list">
-            <li>🍓 Fruta a elegir <strong>(fresa, uva, durazno, manzana)</strong></li>
-            <li>🍦 Chantilly o helado</li>
-            <li>✨ 2 toppings a elegir</li>
-            <li>🍯 1 jarabe <strong>(Hershey's o Lechera)</strong></li>
-          </ul>
-          <div class="included-note">
-            + Agrega base de <strong>G. María (GRATIS)</strong> o de Oreo, Nutella, Mermelada o Cajeta por <strong>costo extra</strong>.
-          </div>
-        </div>
-
-        <!-- Paso 3: Toppings -->
-        <div class="extras-showcase">
-          <h3 class="extras-showcase__title">🎉 Toppings disponibles</h3>
-          <div class="extras-chips" id="chips-toppings"></div>
-        </div>
-      </section>
-
-      <!-- ──────────────────────────────────────────
-           SECCIÓN 2: FRESAS GOLOSAS (especiales)
-      ────────────────────────────────────────── -->
-      <section class="menu-section" id="sec-fresas-especiales">
-        <div class="section-banner section-banner--red">
-          <div class="section-banner__emoji">🍫</div>
-          <div class="section-banner__text">
-            <h2>Fresas Golosas</h2>
-            <p>¡Con chocolates a elegir!</p>
-          </div>
-        </div>
-        <div class="product-grid" id="grid-fresas-especiales"></div>
-        <!-- Chocolates extras -->
-        <div class="extras-showcase extras-showcase--dark">
-          <h3 class="extras-showcase__title">🍬 Agrega chocolates con costo extra</h3>
-          <div class="choco-grid">
-            <div>
-              <p class="choco-group-title">Precio fijo</p>
-              <div class="extras-chips" id="chips-chocolates-fijo"></div>
-            </div>
-            <div>
-              <p class="choco-group-title">Costo variable</p>
-              <div class="extras-chips" id="chips-chocolates-variable"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ──────────────────────────────────────────
-           SECCIÓN 3: FRAPPES
-      ────────────────────────────────────────── -->
-      <section class="menu-section" id="sec-frappes">
-        <div class="section-banner section-banner--purple">
-          <div class="section-banner__emoji">🥤</div>
-          <div class="section-banner__text">
-            <h2>Frappes</h2>
-            <p>Cremosos y deliciosos</p>
-          </div>
-        </div>
-        <div class="product-grid" id="grid-frappes"></div>
-      </section>
-
-      <!-- ──────────────────────────────────────────
-           SECCIÓN 4: WAFFLES
-      ────────────────────────────────────────── -->
-      <section class="menu-section" id="sec-waffles">
-        <div class="section-banner section-banner--amber">
-          <div class="section-banner__emoji">🧇</div>
-          <div class="section-banner__text">
-            <h2>Waffles</h2>
-            <p>Crujientes y esponjosos</p>
-          </div>
-        </div>
-        <div class="product-grid" id="grid-waffles"></div>
-      </section>
-
-      <!-- ──────────────────────────────────────────
-           SECCIÓN 5: SNACKS
-      ────────────────────────────────────────── -->
-      <section class="menu-section" id="sec-snacks">
-        <div class="section-banner section-banner--green">
-          <div class="section-banner__emoji">🍟</div>
-          <div class="section-banner__text">
-            <h2>Snacks</h2>
-            <p>Para botanear rico</p>
-          </div>
-        </div>
-        <div class="product-grid" id="grid-snacks"></div>
-      </section>
-
-      <!-- ──────────────────────────────────────────
-           SECCIÓN 6: BEBIDAS
-      ────────────────────────────────────────── -->
-      <section class="menu-section" id="sec-bebidas">
-        <div class="section-banner section-banner--blue">
-          <div class="section-banner__emoji">🧃</div>
-          <div class="section-banner__text">
-            <h2>Bebidas</h2>
-            <p>Para acompañar tu orden</p>
-          </div>
-        </div>
-        <div class="product-grid" id="grid-bebidas"></div>
-      </section>
-
-      <!-- GRID GENÉRICO para categorías no mapeadas -->
-      <section class="menu-section" id="sec-otros" style="display:none">
-        <div class="section-banner section-banner--pink">
-          <div class="section-banner__emoji">✨</div>
-          <div class="section-banner__text"><h2>Otros</h2></div>
-        </div>
-        <div class="product-grid" id="grid-otros"></div>
-      </section>
-
-      <!-- EMPTY STATE -->
-      <div id="emptyState" class="empty-state hidden">
-        <span class="empty-state__emoji">😅</span>
-        <strong>Sin resultados</strong>
-        <span>Prueba con otra búsqueda o quita los filtros.</span>
+      <!-- Paso 1: Tamaños -->
+      <div class="step-block">
+        <div class="step-block__num">01</div>
+        <h3 class="step-block__title">Escoge el tamaño</h3>
+        <div class="sizes-row" id="sizes-fresas"></div>
       </div>
 
-      <!-- CTA WhatsApp -->
-      <div class="wa-cta">
-        <div class="wa-cta__blob" aria-hidden="true"></div>
-        <div class="wa-cta__content">
-          <div class="wa-cta__title">¿Lista tu orden? 🍓</div>
-          <div class="wa-cta__sub">Escríbenos y te atendemos al momento</div>
-          <a id="ctaWhats" class="cta-wa-btn" href="#" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
-            Pedir por WhatsApp
-          </a>
+      <!-- Paso 2: Contenido -->
+      <div class="includes-box">
+        <div class="includes-box__title">¿Qué incluye tu vaso?</div>
+        <div class="includes-grid">
+          <div class="inc-item"><span class="inc-item__icon">🍓</span><span>Fruta a elegir<br><small>Fresa, uva, durazno o manzana</small></span></div>
+          <div class="inc-item"><span class="inc-item__icon">🍦</span><span>Chantilly o helado</span></div>
+          <div class="inc-item"><span class="inc-item__icon">✨</span><span>2 toppings<br><small>a elegir</small></span></div>
+          <div class="inc-item"><span class="inc-item__icon">🍯</span><span>1 jarabe<br><small>Hershey's o Lechera</small></span></div>
+        </div>
+        <div class="includes-note">
+          ➕ Agrega base de <strong>G. María (gratis)</strong> o Oreo, Nutella, Mermelada, Cajeta <strong>por costo extra</strong>
         </div>
       </div>
 
-      <footer class="site-footer">
-        <span>© <span id="yearNow"></span> Las Cremosas 🍓</span>
-        <span class="dot">·</span>
-        <a href="#" id="openHow" class="foot-link">¿Cómo se actualiza?</a>
-      </footer>
+      <!-- Paso 3: Toppings -->
+      <div class="step-block step-block--light">
+        <div class="step-block__num step-block__num--outline">02</div>
+        <h3 class="step-block__title">Elige tus toppings</h3>
+        <div class="chips-wrap" id="chips-toppings"></div>
+      </div>
+
+      <!-- Paso 4: Bases -->
+      <div class="step-block step-block--light">
+        <div class="step-block__num step-block__num--outline">03</div>
+        <h3 class="step-block__title">Bases / Jarabes</h3>
+        <div class="chips-wrap" id="chips-bases"></div>
+      </div>
+    </section>
+
+    <!-- ── SECCIÓN: FRESAS GOLOSAS / ESPECIALES ── -->
+    <section class="msec" id="sec-especiales" data-cat="Fresas especiales">
+      <div class="msec__head">
+        <div class="msec__label msec__label--red">🍫 Fresas Golosas</div>
+        <p class="msec__sub">Con hasta 10 chocolates diferentes — ¡la experiencia completa!</p>
+      </div>
+      <div class="cards-grid" id="grid-especiales"></div>
+
+      <!-- Chocolates extra -->
+      <div class="choco-panel">
+        <div class="choco-panel__head">
+          <span>🍬</span>
+          <div>
+            <strong>Agrega chocolates extra</strong>
+            <span>Personaliza aún más tu orden</span>
+          </div>
+        </div>
+        <div class="choco-cols">
+          <div class="choco-col">
+            <p class="choco-col__title">Precio fijo</p>
+            <div class="chips-wrap chips-wrap--dark" id="chips-choco-fijo"></div>
+          </div>
+          <div class="choco-col">
+            <p class="choco-col__title">Costo variable</p>
+            <div class="chips-wrap chips-wrap--dark" id="chips-choco-var"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECCIÓN: FRAPPES ── -->
+    <section class="msec" id="sec-frappes" data-cat="Frappes">
+      <div class="msec__head">
+        <div class="msec__label msec__label--purple">🥤 Frappes</div>
+        <p class="msec__sub">Cremosos y con mucho sabor</p>
+      </div>
+      <div class="cards-grid" id="grid-frappes"></div>
+    </section>
+
+    <!-- ── SECCIÓN: WAFFLES ── -->
+    <section class="msec" id="sec-waffles" data-cat="Waffles">
+      <div class="msec__head">
+        <div class="msec__label msec__label--amber">🧇 Waffles</div>
+        <p class="msec__sub">Crujientes por fuera, suaves por dentro</p>
+      </div>
+      <div class="cards-grid" id="grid-waffles"></div>
+    </section>
+
+    <!-- ── SECCIÓN: SNACKS ── -->
+    <section class="msec" id="sec-snacks" data-cat="Snacks">
+      <div class="msec__head">
+        <div class="msec__label msec__label--green">🍟 Snacks</div>
+        <p class="msec__sub">Para botanear rico mientras esperas</p>
+      </div>
+      <div class="cards-grid" id="grid-snacks"></div>
+    </section>
+
+    <!-- ── SECCIÓN: BEBIDAS ── -->
+    <section class="msec" id="sec-bebidas" data-cat="Bebidas">
+      <div class="msec__head">
+        <div class="msec__label msec__label--blue">🧃 Bebidas</div>
+        <p class="msec__sub">Refrescantes para acompañar tu orden</p>
+      </div>
+      <div class="cards-grid" id="grid-bebidas"></div>
+    </section>
+
+    <!-- EMPTY -->
+    <div id="emptyState" class="empty hidden">
+      <span>😅</span><strong>Sin resultados</strong><span>Quita filtros o busca algo diferente</span>
     </div>
-  </main>
+
+    <!-- WA BANNER -->
+    <div class="wa-banner">
+      <div class="wa-banner__text">
+        <strong>¿Ya sabes qué quieres? 🍓</strong>
+        <span>Escríbenos y te atendemos al instante</span>
+      </div>
+      <a id="ctaWhats" href="#" class="btn btn--wa">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+        Pedir por WhatsApp
+      </a>
+    </div>
+
+    <footer class="site-footer">
+      <span>© <span id="yearNow"></span> Las Cremosas · Oaxaca, México</span>
+      <a href="#" id="openHow">¿Cómo se actualiza el menú?</a>
+    </footer>
+  </div>
 </div><!-- /tabMenu -->
 
-<!-- ═══════════════ TAB CAJA ═══════════════ -->
-<div id="tabCaja" class="tab-view">
+<!-- ══════════════ CAJA VIEW ══════════════ -->
+<div id="tabCaja" class="tview">
 
-  <!-- PANTALLA PIN -->
+  <!-- PIN LOCK -->
   <div id="cajaLocked" class="pin-screen">
     <div class="pin-card">
-      <div class="pin-icon">🔐</div>
-      <h2>Acceso a Caja</h2>
-      <p>Ingresa el PIN del encargado</p>
-      <div id="pinDisplay" class="pin-display">––––</div>
-      <div id="pinError" class="pin-error hidden">PIN incorrecto ❌</div>
-      <div class="pin-kbd">
-        <button class="pk" data-val="1">1</button>
-        <button class="pk" data-val="2">2</button>
-        <button class="pk" data-val="3">3</button>
-        <button class="pk" data-val="4">4</button>
-        <button class="pk" data-val="5">5</button>
-        <button class="pk" data-val="6">6</button>
-        <button class="pk" data-val="7">7</button>
-        <button class="pk" data-val="8">8</button>
-        <button class="pk" data-val="9">9</button>
-        <button class="pk pk--del" data-val="del">⌫</button>
-        <button class="pk" data-val="0">0</button>
-        <button class="pk pk--ok" data-val="ok">✓</button>
+      <div class="pin-card__top">
+        <span class="pin-card__icon">🔐</span>
+        <h2>Acceso a Caja</h2>
+        <p>Solo para encargados · ingresa tu PIN</p>
+      </div>
+      <div id="pinDisplay" class="pin-dots">· · · ·</div>
+      <div id="pinError" class="pin-err hidden">PIN incorrecto, inténtalo de nuevo</div>
+      <div class="pin-pad">
+        <button class="pkey" data-val="1">1</button>
+        <button class="pkey" data-val="2">2</button>
+        <button class="pkey" data-val="3">3</button>
+        <button class="pkey" data-val="4">4</button>
+        <button class="pkey" data-val="5">5</button>
+        <button class="pkey" data-val="6">6</button>
+        <button class="pkey" data-val="7">7</button>
+        <button class="pkey" data-val="8">8</button>
+        <button class="pkey" data-val="9">9</button>
+        <button class="pkey pkey--del" data-val="del">⌫</button>
+        <button class="pkey" data-val="0">0</button>
+        <button class="pkey pkey--ok" data-val="ok">✓</button>
       </div>
     </div>
   </div>
 
   <!-- CAJA CONTENT -->
   <div id="cajaContent" class="hidden">
-    <div class="wrap" style="padding-top:24px;padding-bottom:60px">
-      <div class="caja-topbar">
+    <div class="caja-wrap">
+
+      <!-- Header caja -->
+      <div class="caja-hd">
         <div>
-          <h2 class="caja-title">🧾 Caja del día</h2>
-          <p class="caja-date" id="cajaDate"></p>
+          <h2 class="caja-hd__title">Caja del día 🧾</h2>
+          <p class="caja-hd__date" id="cajaDate"></p>
         </div>
-        <button id="btnLockCaja" class="hbtn hbtn--ghost">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <button id="btnLockCaja" class="nav-btn nav-btn--ghost">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Cerrar sesión
         </button>
       </div>
 
-      <!-- Corte del día -->
-      <div class="corte-row">
-        <div class="corte-box corte-box--sales">
-          <div class="corte-box__lbl">Ventas hoy</div>
-          <div id="salesTodayTotal" class="corte-box__val">$0.00</div>
-          <div id="salesCountToday" class="corte-box__sub">0 ventas</div>
+      <!-- Corte -->
+      <div class="corte">
+        <div class="corte-card corte-card--g">
+          <p>Ventas hoy</p>
+          <strong id="salesTodayTotal">$0.00</strong>
+          <small id="salesCountToday">0 ventas</small>
         </div>
-        <div class="corte-box corte-box--expenses">
-          <div class="corte-box__lbl">Gastos hoy</div>
-          <div id="expensesTodayTotal" class="corte-box__val">$0.00</div>
+        <div class="corte-card corte-card--r">
+          <p>Gastos hoy</p>
+          <strong id="expensesTodayTotal">$0.00</strong>
         </div>
-        <div class="corte-box corte-box--profit">
-          <div class="corte-box__lbl">Utilidad</div>
-          <div id="profitTodayTotal" class="corte-box__val">$0.00</div>
+        <div class="corte-card corte-card--p">
+          <p>Utilidad</p>
+          <strong id="profitTodayTotal">$0.00</strong>
         </div>
       </div>
 
       <!-- Productos del día -->
       <div class="caja-panel">
-        <div class="caja-panel__head">
+        <div class="caja-panel__hd">
           <h3>Productos vendidos hoy</h3>
-          <button id="refreshSummary" class="hbtn hbtn--ghost hbtn--sm">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          <button id="refreshSummary" class="nav-btn nav-btn--ghost nav-btn--sm">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
             Actualizar
           </button>
         </div>
-        <div id="topProductsToday" class="mini-list">
-          <div class="mini-empty">Sin ventas aún hoy.</div>
+        <div id="topProductsToday" class="prod-list">
+          <p class="prod-list__empty">Sin ventas registradas hoy.</p>
         </div>
       </div>
 
       <div id="adminMessage" class="status-msg hidden"></div>
 
-      <!-- Sub-tabs Venta / Gasto -->
-      <div class="caja-tabs">
-        <button class="ctab active" data-form="venta">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nueva venta
-        </button>
-        <button class="ctab" data-form="gasto">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nuevo gasto
-        </button>
+      <!-- Sub-tabs -->
+      <div class="ctabs">
+        <button class="ctab ctab--active" data-form="venta">+ Nueva venta</button>
+        <button class="ctab" data-form="gasto">− Nuevo gasto</button>
       </div>
 
-      <!-- Form Venta -->
-      <div id="formVenta" class="caja-panel caja-form active">
-        <div class="form-grid">
-          <div class="field field--full">
-            <label for="saleProduct">Producto</label>
+      <!-- Form venta -->
+      <div id="formVenta" class="caja-panel cform cform--active">
+        <div class="fgrid">
+          <div class="frow frow--full">
+            <label>Producto</label>
             <select id="saleProduct"><option value="">Selecciona…</option></select>
           </div>
-          <div class="field">
-            <label for="saleQty">Cantidad</label>
+          <div class="frow">
+            <label>Cantidad</label>
             <input id="saleQty" type="number" min="1" value="1"/>
           </div>
-          <div class="field">
-            <label for="salePrice">Precio unitario ($)</label>
+          <div class="frow">
+            <label>Precio unitario ($)</label>
             <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00"/>
           </div>
-          <div class="field field--full">
+          <div class="frow frow--full">
             <label>Total a cobrar</label>
-            <div id="saleTotalPreview" class="total-preview">—</div>
+            <div id="saleTotalPreview" class="total-box">—</div>
           </div>
-          <div class="field">
-            <label for="saleManager">Encargado</label>
+          <div class="frow">
+            <label>Encargado</label>
             <input id="saleManager" type="text" placeholder="Tu nombre"/>
           </div>
-          <div class="field">
-            <label for="saleNotes">Notas</label>
-            <input id="saleNotes" type="text" placeholder="Ej. sin crema…"/>
+          <div class="frow">
+            <label>Notas</label>
+            <input id="saleNotes" type="text" placeholder="Observaciones…"/>
           </div>
-          <div class="field field--full">
-            <button id="btnSaveSale" class="hbtn hbtn--primary hbtn--block">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Guardar venta
-            </button>
+          <div class="frow frow--full">
+            <button id="btnSaveSale" class="btn btn--primary btn--block">Guardar venta</button>
           </div>
         </div>
       </div>
 
-      <!-- Form Gasto -->
-      <div id="formGasto" class="caja-panel caja-form">
-        <div class="form-grid">
-          <div class="field">
-            <label for="expenseConcept">Concepto</label>
-            <input id="expenseConcept" type="text" placeholder="Ej. harina…"/>
+      <!-- Form gasto -->
+      <div id="formGasto" class="caja-panel cform">
+        <div class="fgrid">
+          <div class="frow">
+            <label>Concepto</label>
+            <input id="expenseConcept" type="text" placeholder="Ej. harina, leche…"/>
           </div>
-          <div class="field">
-            <label for="expenseCategory">Categoría</label>
+          <div class="frow">
+            <label>Categoría</label>
             <select id="expenseCategory">
               <option value="">Selecciona</option>
-              <option>🛒 Insumos</option>
-              <option>💡 Servicios</option>
-              <option>🏠 Renta</option>
-              <option>👤 Personal</option>
-              <option>🚗 Transporte</option>
-              <option>📦 Otros</option>
+              <option value="Insumos">🛒 Insumos</option>
+              <option value="Servicios">💡 Servicios</option>
+              <option value="Renta">🏠 Renta</option>
+              <option value="Personal">👤 Personal</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Otros">📦 Otros</option>
             </select>
           </div>
-          <div class="field">
-            <label for="expenseAmount">Monto ($)</label>
+          <div class="frow">
+            <label>Monto ($)</label>
             <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00"/>
           </div>
-          <div class="field">
-            <label for="expenseManager">Encargado</label>
+          <div class="frow">
+            <label>Encargado</label>
             <input id="expenseManager" type="text" placeholder="Tu nombre"/>
           </div>
-          <div class="field field--full">
-            <label for="expenseNotes">Notas</label>
+          <div class="frow frow--full">
+            <label>Notas</label>
             <input id="expenseNotes" type="text" placeholder="Ej. compra en mercado"/>
           </div>
-          <div class="field field--full">
-            <button id="btnSaveExpense" class="hbtn hbtn--danger hbtn--block">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Guardar gasto
-            </button>
+          <div class="frow frow--full">
+            <button id="btnSaveExpense" class="btn btn--danger btn--block">Guardar gasto</button>
           </div>
         </div>
       </div>
@@ -418,20 +384,20 @@
   </div>
 </div><!-- /tabCaja -->
 
-<!-- DIALOG info -->
-<dialog id="howDialog" class="info-dialog">
-  <div class="info-dialog__card">
-    <div class="info-dialog__head">
-      <strong>📊 ¿Cómo se actualiza el menú?</strong>
-      <button id="closeHow" class="hbtn hbtn--ghost hbtn--sm">Cerrar</button>
+<!-- DIALOG -->
+<dialog id="howDialog" class="how-dialog">
+  <div class="how-dialog__card">
+    <div class="how-dialog__hd">
+      <strong>¿Cómo se actualiza el menú?</strong>
+      <button id="closeHow" class="nav-btn nav-btn--ghost nav-btn--sm">Cerrar</button>
     </div>
-    <ol class="info-steps">
+    <ol class="how-steps">
       <li>Edita las hojas <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> en Google Sheets.</li>
-      <li>Publica cada hoja como CSV (<em>Archivo → Compartir → Publicar en web</em>).</li>
+      <li>Publica cada hoja como CSV desde <em>Archivo → Compartir → Publicar en web</em>.</li>
       <li>Pega los links en <code>config.js</code>.</li>
-      <li>Cambia el PIN en <code>config.js → cajaPin</code> antes de publicar.</li>
+      <li>Cambia <code>cajaPin</code> en <code>config.js</code> antes de publicar.</li>
     </ol>
-    <p class="info-hint">💡 El menú es público. La caja necesita PIN.</p>
+    <p class="how-hint">El menú es público. La caja requiere PIN y se recomienda usar solo internamente.</p>
   </div>
 </dialog>
 
