@@ -1,242 +1,413 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Las Cremosas 🍓 | Menú Digital</title>
-  <meta name="description" content="Menú digital de Las Cremosas: fresas con crema, waffles, frappes, snacks y bebidas." />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Las Cremosas 🍓 | Menú</title>
+  <meta name="description" content="Fresas con crema, waffles, frappes, snacks y más. ¡Arma tu vaso perfecto!"/>
+  <meta name="theme-color" content="#e8396b"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="header" id="appHeader">
-    <div class="header__inner">
-      <div class="brand">
-        <div class="brand__logo">🍓</div>
-        <div class="brand__text">
-          <div class="brand__name">Las Cremosas</div>
-          <div class="brand__tagline">Menú digital</div>
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="brand">
+      <span class="brand__emoji">🍓</span>
+      <span class="brand__name">Las Cremosas</span>
+    </div>
+    <nav class="top-nav">
+      <button class="nav-pill active" data-tab="menu">Menú</button>
+      <button class="nav-pill" data-tab="caja">🔒 Caja</button>
+    </nav>
+    <div class="header-actions">
+      <button id="btnShare" class="hbtn hbtn--ghost" title="Compartir">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Compartir</span>
+      </button>
+      <a id="btnWhats" class="hbtn hbtn--wa" href="#" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+        Pedir
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ TAB MENÚ ═══════════════ -->
+<div id="tabMenu" class="tab-view active">
+
+  <!-- HERO con drip -->
+  <div class="hero">
+    <div class="hero__confetti" aria-hidden="true">
+      <span>🍓</span><span>✨</span><span>🍓</span><span>🍦</span><span>🍓</span><span>✨</span><span>🍓</span><span>🍦</span>
+    </div>
+    <div class="hero__inner">
+      <p class="hero__eyebrow">¡Bienvenid@ a</p>
+      <h1 class="hero__title">Las Cremosas</h1>
+      <p class="hero__sub">Arma tu vaso perfecto de fresas con crema 🍓</p>
+      <div class="hero__search-box">
+        <div class="search-wrap">
+          <svg class="search-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="searchInput" type="search" placeholder="Buscar producto…" autocomplete="off"/>
         </div>
-      </div>
-      <nav class="header__nav">
-        <button class="nav-tab active" data-tab="menu">Menú</button>
-        <button class="nav-tab" data-tab="caja">Caja</button>
-      </nav>
-      <div class="header__actions">
-        <button id="btnShare" class="btn btn--ghost btn--sm" title="Compartir">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          Compartir
-        </button>
-        <a id="btnWhats" class="btn btn--wa" href="#" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
-          Pedir
-        </a>
+        <div class="filter-row">
+          <select id="categorySelect"><option value="">Todas las categorías</option></select>
+          <label class="avail-toggle">
+            <input id="toggleAvailable" type="checkbox" checked/>
+            <span class="avail-toggle__track"></span>
+            <span>Solo disponibles</span>
+          </label>
+        </div>
       </div>
     </div>
-  </header>
+    <div class="hero__drip" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,0 C240,60 480,80 720,60 C960,40 1200,70 1440,30 L1440,80 L0,80 Z" fill="#fdf0f5"/>
+        <!-- drip drops -->
+        <ellipse cx="120" cy="80" rx="10" ry="18" fill="#fdf0f5"/>
+        <ellipse cx="340" cy="80" rx="8" ry="24" fill="#fdf0f5"/>
+        <ellipse cx="560" cy="80" rx="12" ry="20" fill="#fdf0f5"/>
+        <ellipse cx="780" cy="80" rx="9" ry="28" fill="#fdf0f5"/>
+        <ellipse cx="980" cy="80" rx="11" ry="16" fill="#fdf0f5"/>
+        <ellipse cx="1200" cy="80" rx="8" ry="22" fill="#fdf0f5"/>
+        <ellipse cx="1380" cy="80" rx="10" ry="18" fill="#fdf0f5"/>
+      </svg>
+    </div>
+  </div>
 
-  <!-- VISTA MENÚ -->
-  <div id="tabMenu" class="tab-view active">
+  <!-- MAIN MENU CONTENT -->
+  <main class="page-content" id="menuContent">
+    <div class="wrap">
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero__bg"></div>
-      <div class="hero__inner container">
-        <div class="hero__copy">
-          <h1 class="hero__title">Tu dosis<br><em>de felicidad</em> 🍓</h1>
-          <p class="hero__sub">Fresas con crema, waffles, frappes y más. Menú siempre actualizado.</p>
-        </div>
-        <div class="hero__controls">
-          <div class="search-wrap">
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input id="searchInput" type="search" placeholder="Buscar producto…" autocomplete="off" />
-          </div>
-          <div class="filter-row">
-            <select id="categorySelect" aria-label="Categoría">
-              <option value="">Todas las categorías</option>
-            </select>
-            <label class="toggle-pill">
-              <input id="toggleAvailable" type="checkbox" checked />
-              <span class="toggle-pill__track"></span>
-              <span class="toggle-pill__label">Solo disponibles</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MENÚ GRID -->
-    <main class="container main-content">
-      <div class="section-head">
-        <h2 class="section-title">Menú</h2>
-        <div class="meta-pills">
-          <span id="lastUpdated" class="pill">Cargando…</span>
-          <span id="itemsCount" class="pill">—</span>
-        </div>
+      <!-- Meta info -->
+      <div class="meta-bar">
+        <span id="lastUpdated" class="meta-chip">Cargando…</span>
+        <span id="itemsCount" class="meta-chip">—</span>
       </div>
 
-      <div id="menuGrid" class="menu-grid"></div>
+      <!-- ──────────────────────────────────────────
+           SECCIÓN 1: FRESAS CON CREMA
+      ────────────────────────────────────────── -->
+      <section class="menu-section" id="sec-fresas-con-crema">
+        <div class="section-banner section-banner--pink">
+          <div class="section-banner__emoji">🍓</div>
+          <div class="section-banner__text">
+            <h2>Fresas con Crema</h2>
+            <p>¡Arma tu vaso perfecto!</p>
+          </div>
+        </div>
+
+        <!-- Paso 1: Tamaño -->
+        <div class="step-card">
+          <div class="step-num">Paso 1</div>
+          <h3 class="step-title">🥤 Escoge el tamaño</h3>
+          <div class="size-grid" id="grid-fresas-con-crema"></div>
+        </div>
+
+        <!-- Paso 2: Qué lleva -->
+        <div class="included-card">
+          <h3 class="included-title">🫙 ¿Qué lleva tu vaso?</h3>
+          <ul class="included-list">
+            <li>🍓 Fruta a elegir <strong>(fresa, uva, durazno, manzana)</strong></li>
+            <li>🍦 Chantilly o helado</li>
+            <li>✨ 2 toppings a elegir</li>
+            <li>🍯 1 jarabe <strong>(Hershey's o Lechera)</strong></li>
+          </ul>
+          <div class="included-note">
+            + Agrega base de <strong>G. María (GRATIS)</strong> o de Oreo, Nutella, Mermelada o Cajeta por <strong>costo extra</strong>.
+          </div>
+        </div>
+
+        <!-- Paso 3: Toppings -->
+        <div class="extras-showcase">
+          <h3 class="extras-showcase__title">🎉 Toppings disponibles</h3>
+          <div class="extras-chips" id="chips-toppings"></div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────
+           SECCIÓN 2: FRESAS GOLOSAS (especiales)
+      ────────────────────────────────────────── -->
+      <section class="menu-section" id="sec-fresas-especiales">
+        <div class="section-banner section-banner--red">
+          <div class="section-banner__emoji">🍫</div>
+          <div class="section-banner__text">
+            <h2>Fresas Golosas</h2>
+            <p>¡Con chocolates a elegir!</p>
+          </div>
+        </div>
+        <div class="product-grid" id="grid-fresas-especiales"></div>
+        <!-- Chocolates extras -->
+        <div class="extras-showcase extras-showcase--dark">
+          <h3 class="extras-showcase__title">🍬 Agrega chocolates con costo extra</h3>
+          <div class="choco-grid">
+            <div>
+              <p class="choco-group-title">Precio fijo</p>
+              <div class="extras-chips" id="chips-chocolates-fijo"></div>
+            </div>
+            <div>
+              <p class="choco-group-title">Costo variable</p>
+              <div class="extras-chips" id="chips-chocolates-variable"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────
+           SECCIÓN 3: FRAPPES
+      ────────────────────────────────────────── -->
+      <section class="menu-section" id="sec-frappes">
+        <div class="section-banner section-banner--purple">
+          <div class="section-banner__emoji">🥤</div>
+          <div class="section-banner__text">
+            <h2>Frappes</h2>
+            <p>Cremosos y deliciosos</p>
+          </div>
+        </div>
+        <div class="product-grid" id="grid-frappes"></div>
+      </section>
+
+      <!-- ──────────────────────────────────────────
+           SECCIÓN 4: WAFFLES
+      ────────────────────────────────────────── -->
+      <section class="menu-section" id="sec-waffles">
+        <div class="section-banner section-banner--amber">
+          <div class="section-banner__emoji">🧇</div>
+          <div class="section-banner__text">
+            <h2>Waffles</h2>
+            <p>Crujientes y esponjosos</p>
+          </div>
+        </div>
+        <div class="product-grid" id="grid-waffles"></div>
+      </section>
+
+      <!-- ──────────────────────────────────────────
+           SECCIÓN 5: SNACKS
+      ────────────────────────────────────────── -->
+      <section class="menu-section" id="sec-snacks">
+        <div class="section-banner section-banner--green">
+          <div class="section-banner__emoji">🍟</div>
+          <div class="section-banner__text">
+            <h2>Snacks</h2>
+            <p>Para botanear rico</p>
+          </div>
+        </div>
+        <div class="product-grid" id="grid-snacks"></div>
+      </section>
+
+      <!-- ──────────────────────────────────────────
+           SECCIÓN 6: BEBIDAS
+      ────────────────────────────────────────── -->
+      <section class="menu-section" id="sec-bebidas">
+        <div class="section-banner section-banner--blue">
+          <div class="section-banner__emoji">🧃</div>
+          <div class="section-banner__text">
+            <h2>Bebidas</h2>
+            <p>Para acompañar tu orden</p>
+          </div>
+        </div>
+        <div class="product-grid" id="grid-bebidas"></div>
+      </section>
+
+      <!-- GRID GENÉRICO para categorías no mapeadas -->
+      <section class="menu-section" id="sec-otros" style="display:none">
+        <div class="section-banner section-banner--pink">
+          <div class="section-banner__emoji">✨</div>
+          <div class="section-banner__text"><h2>Otros</h2></div>
+        </div>
+        <div class="product-grid" id="grid-otros"></div>
+      </section>
+
+      <!-- EMPTY STATE -->
       <div id="emptyState" class="empty-state hidden">
         <span class="empty-state__emoji">😅</span>
         <strong>Sin resultados</strong>
-        <span>Prueba con otra búsqueda o quita filtros.</span>
+        <span>Prueba con otra búsqueda o quita los filtros.</span>
       </div>
 
-      <!-- EXTRAS -->
-      <div class="section-head" style="margin-top:40px">
-        <h2 class="section-title">Extras & Complementos</h2>
-      </div>
-      <div class="extras-grid">
-        <div class="extras-card">
-          <div class="extras-card__icon">🍫</div>
-          <h3>Chocolates</h3>
-          <ul id="extrasChocolates" class="extras-list"></ul>
-        </div>
-        <div class="extras-card">
-          <div class="extras-card__icon">🫙</div>
-          <h3>Bases / Jarabes</h3>
-          <ul id="extrasBases" class="extras-list"></ul>
-        </div>
-        <div class="extras-card">
-          <div class="extras-card__icon">✨</div>
-          <h3>Toppings</h3>
-          <ul id="extrasToppings" class="extras-list"></ul>
-          <p class="extras-note">* Algunos toppings pueden tener costo adicional.</p>
-        </div>
-      </div>
-
-      <!-- CTA WHATSAPP -->
+      <!-- CTA WhatsApp -->
       <div class="wa-cta">
-        <div class="wa-cta__left">
-          <strong>¿Listo para ordenar?</strong>
-          <span>Te atendemos por WhatsApp 🍓</span>
+        <div class="wa-cta__blob" aria-hidden="true"></div>
+        <div class="wa-cta__content">
+          <div class="wa-cta__title">¿Lista tu orden? 🍓</div>
+          <div class="wa-cta__sub">Escríbenos y te atendemos al momento</div>
+          <a id="ctaWhats" class="cta-wa-btn" href="#" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.534 5.846L.046 23.954l6.292-1.464A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.375l-.36-.214-3.732.868.938-3.636-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+            Pedir por WhatsApp
+          </a>
         </div>
-        <a id="ctaWhats" class="btn btn--wa" href="#" target="_blank" rel="noopener">Abrir WhatsApp</a>
       </div>
 
-      <footer class="footer">
-        <span>© <span id="yearNow"></span> Las Cremosas</span>
+      <footer class="site-footer">
+        <span>© <span id="yearNow"></span> Las Cremosas 🍓</span>
         <span class="dot">·</span>
-        <a href="#" id="openHow" class="link">¿Cómo se actualiza el menú?</a>
+        <a href="#" id="openHow" class="foot-link">¿Cómo se actualiza?</a>
       </footer>
-    </main>
+    </div>
+  </main>
+</div><!-- /tabMenu -->
+
+<!-- ═══════════════ TAB CAJA ═══════════════ -->
+<div id="tabCaja" class="tab-view">
+
+  <!-- PANTALLA PIN -->
+  <div id="cajaLocked" class="pin-screen">
+    <div class="pin-card">
+      <div class="pin-icon">🔐</div>
+      <h2>Acceso a Caja</h2>
+      <p>Ingresa el PIN del encargado</p>
+      <div id="pinDisplay" class="pin-display">––––</div>
+      <div id="pinError" class="pin-error hidden">PIN incorrecto ❌</div>
+      <div class="pin-kbd">
+        <button class="pk" data-val="1">1</button>
+        <button class="pk" data-val="2">2</button>
+        <button class="pk" data-val="3">3</button>
+        <button class="pk" data-val="4">4</button>
+        <button class="pk" data-val="5">5</button>
+        <button class="pk" data-val="6">6</button>
+        <button class="pk" data-val="7">7</button>
+        <button class="pk" data-val="8">8</button>
+        <button class="pk" data-val="9">9</button>
+        <button class="pk pk--del" data-val="del">⌫</button>
+        <button class="pk" data-val="0">0</button>
+        <button class="pk pk--ok" data-val="ok">✓</button>
+      </div>
+    </div>
   </div>
 
-  <!-- VISTA CAJA -->
-  <div id="tabCaja" class="tab-view">
-    <div class="container" style="padding-top:24px; padding-bottom:60px">
+  <!-- CAJA CONTENT -->
+  <div id="cajaContent" class="hidden">
+    <div class="wrap" style="padding-top:24px;padding-bottom:60px">
+      <div class="caja-topbar">
+        <div>
+          <h2 class="caja-title">🧾 Caja del día</h2>
+          <p class="caja-date" id="cajaDate"></p>
+        </div>
+        <button id="btnLockCaja" class="hbtn hbtn--ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
 
-      <!-- CORTE DEL DÍA -->
-      <div class="corte-grid">
-        <div class="corte-card corte-card--sales">
-          <div class="corte-card__label">Ventas hoy</div>
-          <div id="salesTodayTotal" class="corte-card__value">$0.00</div>
-          <div id="salesCountToday" class="corte-card__sub">0 ventas</div>
+      <!-- Corte del día -->
+      <div class="corte-row">
+        <div class="corte-box corte-box--sales">
+          <div class="corte-box__lbl">Ventas hoy</div>
+          <div id="salesTodayTotal" class="corte-box__val">$0.00</div>
+          <div id="salesCountToday" class="corte-box__sub">0 ventas</div>
         </div>
-        <div class="corte-card corte-card--expenses">
-          <div class="corte-card__label">Gastos hoy</div>
-          <div id="expensesTodayTotal" class="corte-card__value">$0.00</div>
+        <div class="corte-box corte-box--expenses">
+          <div class="corte-box__lbl">Gastos hoy</div>
+          <div id="expensesTodayTotal" class="corte-box__val">$0.00</div>
         </div>
-        <div class="corte-card corte-card--profit">
-          <div class="corte-card__label">Utilidad aprox.</div>
-          <div id="profitTodayTotal" class="corte-card__value">$0.00</div>
+        <div class="corte-box corte-box--profit">
+          <div class="corte-box__lbl">Utilidad</div>
+          <div id="profitTodayTotal" class="corte-box__val">$0.00</div>
         </div>
-        <div class="corte-card corte-card--refresh">
-          <button id="refreshSummary" class="btn btn--ghost btn--sm btn--block">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-            Actualizar corte
+      </div>
+
+      <!-- Productos del día -->
+      <div class="caja-panel">
+        <div class="caja-panel__head">
+          <h3>Productos vendidos hoy</h3>
+          <button id="refreshSummary" class="hbtn hbtn--ghost hbtn--sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            Actualizar
           </button>
-          <div class="corte-card__label" style="margin-top:10px">Productos de hoy</div>
-          <div id="topProductsToday" class="mini-list">
-            <div class="mini-list__empty">Sin ventas aún.</div>
-          </div>
+        </div>
+        <div id="topProductsToday" class="mini-list">
+          <div class="mini-empty">Sin ventas aún hoy.</div>
         </div>
       </div>
 
-      <div id="adminMessage" class="status-message hidden"></div>
+      <div id="adminMessage" class="status-msg hidden"></div>
 
-      <!-- TABS CAJA -->
+      <!-- Sub-tabs Venta / Gasto -->
       <div class="caja-tabs">
-        <button class="caja-tab active" data-form="venta">Registrar venta</button>
-        <button class="caja-tab" data-form="gasto">Registrar gasto</button>
+        <button class="ctab active" data-form="venta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nueva venta
+        </button>
+        <button class="ctab" data-form="gasto">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo gasto
+        </button>
       </div>
 
-      <!-- FORM VENTA -->
-      <div id="formVenta" class="panel caja-form active">
-        <div class="form-grid" id="saleForm">
-          <div class="field">
+      <!-- Form Venta -->
+      <div id="formVenta" class="caja-panel caja-form active">
+        <div class="form-grid">
+          <div class="field field--full">
             <label for="saleProduct">Producto</label>
-            <select id="saleProduct" required>
-              <option value="">Selecciona producto</option>
-            </select>
+            <select id="saleProduct"><option value="">Selecciona…</option></select>
           </div>
           <div class="field">
             <label for="saleQty">Cantidad</label>
-            <input id="saleQty" type="number" min="1" value="1" required />
+            <input id="saleQty" type="number" min="1" value="1"/>
           </div>
           <div class="field">
             <label for="salePrice">Precio unitario ($)</label>
-            <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00" required />
+            <input id="salePrice" type="number" min="0" step="0.01" placeholder="0.00"/>
           </div>
-          <div class="field">
-            <label>Total estimado</label>
+          <div class="field field--full">
+            <label>Total a cobrar</label>
             <div id="saleTotalPreview" class="total-preview">—</div>
           </div>
           <div class="field">
             <label for="saleManager">Encargado</label>
-            <input id="saleManager" type="text" placeholder="Nombre" />
+            <input id="saleManager" type="text" placeholder="Tu nombre"/>
           </div>
-          <div class="field field--full">
+          <div class="field">
             <label for="saleNotes">Notas</label>
-            <input id="saleNotes" type="text" placeholder="Ej. sin crema, extra fresa…" />
+            <input id="saleNotes" type="text" placeholder="Ej. sin crema…"/>
           </div>
           <div class="field field--full">
-            <button class="btn btn--primary btn--block" id="btnSaveSale" type="button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <button id="btnSaveSale" class="hbtn hbtn--primary hbtn--block">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Guardar venta
             </button>
           </div>
         </div>
       </div>
 
-      <!-- FORM GASTO -->
-      <div id="formGasto" class="panel caja-form">
-        <div class="form-grid" id="expenseForm">
+      <!-- Form Gasto -->
+      <div id="formGasto" class="caja-panel caja-form">
+        <div class="form-grid">
           <div class="field">
             <label for="expenseConcept">Concepto</label>
-            <input id="expenseConcept" type="text" placeholder="Ej. harina, leche…" required />
+            <input id="expenseConcept" type="text" placeholder="Ej. harina…"/>
           </div>
           <div class="field">
             <label for="expenseCategory">Categoría</label>
-            <select id="expenseCategory" required>
+            <select id="expenseCategory">
               <option value="">Selecciona</option>
-              <option value="Insumos">🛒 Insumos</option>
-              <option value="Servicios">💡 Servicios</option>
-              <option value="Renta">🏠 Renta</option>
-              <option value="Personal">👤 Personal</option>
-              <option value="Transporte">🚗 Transporte</option>
-              <option value="Otros">📦 Otros</option>
+              <option>🛒 Insumos</option>
+              <option>💡 Servicios</option>
+              <option>🏠 Renta</option>
+              <option>👤 Personal</option>
+              <option>🚗 Transporte</option>
+              <option>📦 Otros</option>
             </select>
           </div>
           <div class="field">
             <label for="expenseAmount">Monto ($)</label>
-            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
+            <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00"/>
           </div>
           <div class="field">
             <label for="expenseManager">Encargado</label>
-            <input id="expenseManager" type="text" placeholder="Nombre" />
+            <input id="expenseManager" type="text" placeholder="Tu nombre"/>
           </div>
           <div class="field field--full">
             <label for="expenseNotes">Notas</label>
-            <input id="expenseNotes" type="text" placeholder="Ej. compra en abarrotes del centro" />
+            <input id="expenseNotes" type="text" placeholder="Ej. compra en mercado"/>
           </div>
           <div class="field field--full">
-            <button class="btn btn--danger btn--block" id="btnSaveExpense" type="button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <button id="btnSaveExpense" class="hbtn hbtn--danger hbtn--block">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Guardar gasto
             </button>
           </div>
@@ -245,28 +416,26 @@
 
     </div>
   </div>
+</div><!-- /tabCaja -->
 
-  <!-- DIALOG: Cómo se actualiza -->
-  <dialog id="howDialog" class="dialog">
-    <div class="dialog__card">
-      <div class="dialog__head">
-        <div>
-          <div class="dialog__title">📊 Actualizar desde Google Sheets</div>
-          <div class="dialog__sub">Sin código, solo edita tu hoja de cálculo.</div>
-        </div>
-        <button id="closeHow" class="btn btn--ghost btn--sm">Cerrar</button>
-      </div>
-      <ol class="steps">
-        <li>Edita las hojas <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> con tus productos.</li>
-        <li>En Google Sheets: <em>Archivo → Compartir → Publicar en la web</em>, selecciona la hoja y elige <strong>CSV</strong>.</li>
-        <li>Pega esos links en <code>config.js</code>.</li>
-        <li>Las ventas y gastos se guardan en <strong>VENTAS</strong> y <strong>GASTOS</strong> a través del Apps Script.</li>
-      </ol>
-      <div class="hint">💡 El menú es público; la caja úsala solo internamente.</div>
+<!-- DIALOG info -->
+<dialog id="howDialog" class="info-dialog">
+  <div class="info-dialog__card">
+    <div class="info-dialog__head">
+      <strong>📊 ¿Cómo se actualiza el menú?</strong>
+      <button id="closeHow" class="hbtn hbtn--ghost hbtn--sm">Cerrar</button>
     </div>
-  </dialog>
+    <ol class="info-steps">
+      <li>Edita las hojas <strong>DATA_ITEMS</strong> y <strong>DATA_EXTRAS</strong> en Google Sheets.</li>
+      <li>Publica cada hoja como CSV (<em>Archivo → Compartir → Publicar en web</em>).</li>
+      <li>Pega los links en <code>config.js</code>.</li>
+      <li>Cambia el PIN en <code>config.js → cajaPin</code> antes de publicar.</li>
+    </ol>
+    <p class="info-hint">💡 El menú es público. La caja necesita PIN.</p>
+  </div>
+</dialog>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
