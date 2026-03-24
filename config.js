@@ -5,8 +5,9 @@
 window.MENU_CONFIG = {
   businessName:       "Las Cremosas",
   currency:           "MXN",
-pinEmpleado: "1111",  // ← el que uses para empleados
-pinAdmin:    "9999",  // ← solo tú lo sabes         // ← cámbialo por tu PIN secreto
+  cajaPin:            "1234",          // ← PIN legacy (no se usa)
+  pinEmpleado:        "1111",          // ← PIN del empleado (cámbialo)
+  pinAdmin:           "9999",          // ← PIN del administrador (cámbialo)
   whatsappPhoneE164:  "529515903045",
 
   sheets: {
